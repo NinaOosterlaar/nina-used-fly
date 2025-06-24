@@ -2,11 +2,11 @@
 @import "tailwindcss";
 
 @theme {
-	--color-pastel-pink: "#FFD1DC";
-	--color-soft-pink: "#F8C8DC",
-	--color-light-pink: "#FFE5EC",
-	--color-dusty-pink: "#D8A7B1",
-	--color-deep-pink: "#FF85A2"
+	--color-pastel-pink: #FFD1DC;
+	--color-soft-pink: #F8C8DC;
+	--color-light-pink: #FFE5EC;
+	--color-dusty-pink: #D8A7B1;
+	--color-deep-pink: #FF85A2;
 }
 
 body {
