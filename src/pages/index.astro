@@ -37,49 +37,60 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 						></i>
 						Places I've Been
 					</h2>
-					<div class="map-container">
-						<img
-							src="https://mapsvg.com/static/maps/geo/world-map.svg"
-							alt="World Map"
-							class="map-placeholder"
-						/>
+					<div
+						class="map-container relative overflow-auto cursor-grab"
+						id="draggable-map"
+						style="width: 100%; height: 400px;"
+					>
+						<div
+							class="map-inner"
+							style="width: 1200px; height: 800px; position: relative;"
+						>
+							<img
+								src="/src/assets/world.svg"
+								alt="World Map"
+								class="map-placeholder absolute top-0 left-0"
+								style="user-drag: none; user-select: none; pointer-events: none;"
+								draggable="false"
+							/>
 
-						<!-- Country Markers -->
-						<div
-							class="country-marker"
-							style="top: 30%; left: 75%;"
-							title="Japan"
-						>
-						</div>
-						<div
-							class="country-marker"
-							style="top: 40%; left: 50%;"
-							title="France"
-						>
-						</div>
-						<div
-							class="country-marker"
-							style="top: 60%; left: 70%;"
-							title="Australia"
-						>
-						</div>
-						<div
-							class="country-marker"
-							style="top: 35%; left: 60%;"
-							title="Italy"
-						>
-						</div>
-						<div
-							class="country-marker"
-							style="top: 25%; left: 20%;"
-							title="Canada"
-						>
-						</div>
-						<div
-							class="country-marker"
-							style="top: 45%; left: 15%;"
-							title="USA"
-						>
+							<!-- Country Markers -->
+							<div
+								class="country-marker"
+								style="top: 52.5%; left: 86%;"
+								title="Japan"
+							>
+							</div>
+							<div
+								class="country-marker"
+								style="top: 47%; left: 47.8%;"
+								title="France"
+							>
+							</div>
+							<div
+								class="country-marker"
+								style="top: 80%; left: 85%;"
+								title="Australia"
+							>
+							</div>
+							<div
+								class="country-marker"
+								style="top: 50%; left: 51%;"
+								title="Italy"
+							>
+							</div>
+							<div
+								class="country-marker"
+								style="top: 47.5%; left: 26%;"
+								title="Canada"
+							>
+							</div>
+							<div
+								class="country-marker"
+								style="top: 52%; left: 14%;"
+								title="USA"
+							>
+							</div>
 						</div>
 					</div>
 				</section>
@@ -234,8 +245,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 		</main>
 		<Footer />
 
+		<!-- Navbar menu -->
 		<script>
-			// Simple script for mobile menu toggle (would be expanded in a real implementation)
 			document
 				.querySelector("button.md\\:hidden")
 				.addEventListener("click", function () {
@@ -267,6 +278,57 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 						{ once: true },
 					);
 				});
+			});
+		</script>
+
+		<!-- Draggable Map Script -->
+		<script type="module" is:inline>
+			const map = document.getElementById("draggable-map");
+			let isDragging = false;
+			let startX, startY, scrollLeft, scrollTop;
+
+			map.addEventListener("mousedown", (e) => {
+				isDragging = true;
+				map.classList.add("dragging");
+				startX = e.pageX - map.offsetLeft;
+				startY = e.pageY - map.offsetTop;
+				scrollLeft = map.scrollLeft;
+				scrollTop = map.scrollTop;
+			});
+
+			map.addEventListener("mouseleave", () => {
+				isDragging = false;
+				map.classList.remove("dragging");
+			});
+
+			map.addEventListener("mouseup", () => {
+				isDragging = false;
+				map.classList.remove("dragging");
+			});
+
+			map.addEventListener("mousemove", (e) => {
+				if (!isDragging) return;
+				e.preventDefault();
+				const x = e.pageX - map.offsetLeft;
+				const y = e.pageY - map.offsetTop;
+				const walkX = x - startX;
+				const walkY = y - startY;
+				map.scrollLeft = scrollLeft - walkX;
+				map.scrollTop = scrollTop - walkY;
+			});
+
+			// Prevent image drag
+			const img = map.querySelector(".map-placeholder");
+			img.addEventListener("dragstart", (e) => e.preventDefault());
+		</script>
+
+		<script is:inline>
+			// Center the map on load
+			window.addEventListener("DOMContentLoaded", () => {
+				const map = document.getElementById("draggable-map");
+				const inner = map.querySelector(".map-inner");
+				map.scrollLeft = (inner.offsetWidth - map.offsetWidth) / 2;
+				map.scrollTop = (inner.offsetHeight - map.offsetHeight) / 2;
 			});
 		</script>
 	</body>

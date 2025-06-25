@@ -82,6 +82,53 @@ h3 {
 	width: 100%;
 }
 
+.map-container {
+	width: 100%;
+	height: 400px;
+	overflow: auto;
+	position: relative;
+	cursor: grab;
+	background: #f8f8fa;
+}
+
+.map-container.dragging {
+	cursor: grabbing;
+}
+
+.map-inner {
+	width: 1200px;
+	height: 800px;
+	position: relative;
+}
+
+.map-placeholder {
+	width: 1200px;
+	height: 800px;
+	max-width: none;
+	max-height: none;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.country-marker {
+	position: absolute;
+	width: 18px;
+	height: 18px;
+	background: #e75480;
+	border: 2px solid #fff;
+	border-radius: 50%;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	transform: translate(-50%, -50%);
+	cursor: pointer;
+	transition: box-shadow 0.2s;
+	z-index: 2;
+}
+
+.country-marker:hover {
+	box-shadow: 0 4px 16px rgba(231, 84, 128, 0.3);
+}
+
 @media (max-width: 768px) {
 	.map-container {
 		height: 300px;
