@@ -3,32 +3,92 @@ import { SITE_TITLE } from "../consts";
 ---
 
 <header>
-	<nav class="bg-white shadow-sm py-4 px-6 sticky top-0 z-10">
-		<div class="max-w-6xl mx-auto flex justify-between items-center">
-			<a
-				href="#"
-				class="text-2xl font-bold text-deep-pink flex items-center"
-			>
-				<i class="fas fa-plane-departure mr-2"></i>
-				{SITE_TITLE}
-			</a>
-			<div class="hidden md:flex space-x-8">
-				<a href="#" class="nav-link text-gray-700 hover:text-deep-pink"
+	<nav class="bg-white shadow-sm sticky top-0 z-50">
+		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+			<div class="flex justify-between h-16">
+				<div class="flex items-center">
+					<a href="#" class="flex-shrink-0 flex items-center">
+						<i
+							class="fas fa-plane-departure text-2xl text-pink-300 mr-2"
+						></i>
+						<span
+							class="title-font text-xl font-semibold text-pink-400"
+							>Nina Used Fly</span
+						>
+					</a>
+				</div>
+				<div
+					class="hidden md:ml-6 md:flex md:items-center md:space-x-8"
+				>
+					<a
+						href="#"
+						class="nav-link text-pink-500 hover:text-pink-700 px-1 pt-1 text-sm font-medium"
+						>Home</a
+					>
+					<a
+						href="#"
+						class="nav-link text-gray-500 hover:text-pink-500 px-1 pt-1 text-sm font-medium"
+						>Diary</a
+					>
+					<a
+						href="#"
+						class="nav-link text-gray-500 hover:text-pink-500 px-1 pt-1 text-sm font-medium"
+						>Destinations</a
+					>
+					<a
+						href="#"
+						class="nav-link text-gray-500 hover:text-pink-500 px-1 pt-1 text-sm font-medium"
+						>About</a
+					>
+					<a
+						href="#"
+						class="nav-link text-gray-500 hover:text-pink-500 px-1 pt-1 text-sm font-medium"
+						>Contact</a
+					>
+				</div>
+				<div class="flex items-center md:hidden">
+					<button
+						type="button"
+						class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-pink-500 focus:outline-none"
+						aria-controls="mobile-menu"
+						aria-expanded="false"
+					>
+						<span class="sr-only">Open main menu</span>
+						<i class="fas fa-bars text-xl"></i>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Mobile menu -->
+		<div class="md:hidden hidden" id="mobile-menu">
+			<div class="pt-2 pb-3 space-y-1">
+				<a
+					href="#"
+					class="bg-pink-50 text-pink-700 block pl-3 pr-4 py-2 border-l-4 border-pink-500 text-base font-medium"
 					>Home</a
 				>
-				<a href="#" class="nav-link text-gray-700 hover:text-deep-pink"
-					>Travels</a
+				<a
+					href="#"
+					class="text-gray-500 hover:bg-pink-50 hover:text-pink-500 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium"
+					>Diary</a
 				>
-				<a href="#" class="nav-link text-gray-700 hover:text-deep-pink"
+				<a
+					href="#"
+					class="text-gray-500 hover:bg-pink-50 hover:text-pink-500 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium"
+					>Destinations</a
+				>
+				<a
+					href="#"
+					class="text-gray-500 hover:bg-pink-50 hover:text-pink-500 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium"
 					>About</a
 				>
-				<a href="#" class="nav-link text-gray-700 hover:text-deep-pink"
+				<a
+					href="#"
+					class="text-gray-500 hover:bg-pink-50 hover:text-pink-500 block pl-3 pr-4 py-2 border-l-4 border-transparent text-base font-medium"
 					>Contact</a
 				>
 			</div>
-			<button class="md:hidden text-gray-700">
-				<i class="fas fa-bars text-xl"></i>
-			</button>
 		</div>
 	</nav>
 </header>

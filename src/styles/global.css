@@ -1,46 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Quicksand:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600&family=Poppins:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
-@theme {
-	--color-pastel-pink: #FFD1DC;
-	--color-soft-pink: #F8C8DC;
-	--color-light-pink: #FFE5EC;
-	--color-dusty-pink: #D8A7B1;
-	--color-deep-pink: #FF85A2;
-}
-
 body {
-	font-family: 'Quicksand', sans-serif;
-	background-color: #FFF9FB;
+	font-family: 'Poppins', sans-serif;
+	background-color: #fff9fb;
+	color: #5a4a4a;
 }
 
-h1,
-h2,
-h3 {
+.title-font {
 	font-family: 'Playfair Display', serif;
 }
 
-.map-container {
-	position: relative;
-	width: 100%;
-	height: 400px;
-	background-color: #FFE5EC;
-	border-radius: 16px;
-	overflow: hidden;
-}
-
-.map-placeholder {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	opacity: 0.7;
-}
-
-.country-marker {
+.map-marker {
 	position: absolute;
 	width: 12px;
 	height: 12px;
-	background-color: #FF85A2;
+	background-color: #ff85a2;
 	border-radius: 50%;
 	border: 2px solid white;
 	transform: translate(-50%, -50%);
@@ -48,19 +23,36 @@ h3 {
 	transition: all 0.3s ease;
 }
 
-.country-marker:hover {
+.map-marker:hover {
 	transform: translate(-50%, -50%) scale(1.5);
-	background-color: #D8A7B1;
+	background-color: #ff6b8b;
 }
 
-.blog-card {
-	transition: all 0.3s ease;
-	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+.map-marker.active {
+	background-color: #ff6b8b;
+	transform: translate(-50%, -50%) scale(1.5);
 }
 
-.blog-card:hover {
+.map-tooltip {
+	position: absolute;
+	background-color: white;
+	padding: 5px 10px;
+	border-radius: 6px;
+	font-size: 12px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	pointer-events: none;
+	opacity: 0;
+	transition: opacity 0.3s;
+	z-index: 10;
+}
+
+.post-card {
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.post-card:hover {
 	transform: translateY(-5px);
-	box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+	box-shadow: 0 10px 25px rgba(255, 133, 162, 0.2);
 }
 
 .nav-link {
@@ -74,63 +66,10 @@ h3 {
 	height: 2px;
 	bottom: -2px;
 	left: 0;
-	background-color: #FF85A2;
+	background-color: #ff85a2;
 	transition: width 0.3s ease;
 }
 
 .nav-link:hover::after {
 	width: 100%;
-}
-
-.map-container {
-	width: 100%;
-	height: 400px;
-	overflow: auto;
-	position: relative;
-	cursor: grab;
-	background: #f8f8fa;
-}
-
-.map-container.dragging {
-	cursor: grabbing;
-}
-
-.map-inner {
-	width: 1200px;
-	height: 800px;
-	position: relative;
-}
-
-.map-placeholder {
-	width: 1200px;
-	height: 800px;
-	max-width: none;
-	max-height: none;
-	position: absolute;
-	top: 0;
-	left: 0;
-}
-
-.country-marker {
-	position: absolute;
-	width: 18px;
-	height: 18px;
-	background: #e75480;
-	border: 2px solid #fff;
-	border-radius: 50%;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-	transform: translate(-50%, -50%);
-	cursor: pointer;
-	transition: box-shadow 0.2s;
-	z-index: 2;
-}
-
-.country-marker:hover {
-	box-shadow: 0 4px 16px rgba(231, 84, 128, 0.3);
-}
-
-@media (max-width: 768px) {
-	.map-container {
-		height: 300px;
-	}
 }
