@@ -13,216 +13,126 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 	<body>
 		<Header />
 		<main>
-			<div class="relative bg-gradient-to-b from-pink-50 to-white">
+			<!-- Hero Section -->
+			<div class="relative bg-gradient-to-br from-pink-50 via-white to-pink-25 min-h-[70vh] flex items-center">
+				<div class="absolute inset-0 bg-gradient-to-b from-transparent to-white/20"></div>
 				<div
-					class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20"
+					class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full"
 				>
 					<div class="text-center">
 						<h1
-							class="title-font text-4xl md:text-5xl font-bold text-pink-400 mb-4"
+							class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight"
 						>
 							Nina's Travel Diary
 						</h1>
-						<p class="max-w-2xl mx-auto text-lg text-gray-600">
+						<p class="max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed">
 							Chronicles of a wanderlust soul exploring the world
 							one flight at a time
 						</p>
+						<div class="mt-8">
+							<a
+								href="#journey"
+								class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
+							>
+								Start Exploring
+								<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+								</svg>
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
 
 			<!-- Travel Map Section -->
-			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-				<div class="text-center mb-12">
-					<h2
-						class="title-font text-3xl font-semibold text-pink-400 mb-2"
+			<div id="journey" class="relative bg-gradient-to-b from-white to-pink-50 py-20">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="text-center mb-16">
+						<h2
+							class="title-font text-4xl font-semibold text-pink-400 mb-4"
+						>
+							My Journey So Far
+						</h2>
+						<p class="text-gray-600 max-w-2xl mx-auto text-lg">
+							Hover over the markers to discover the places that have captured my heart
+						</p>
+					</div>
+
+					<div
+						class="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-pink-100"
+						style="height: 500px;"
 					>
-						My Journey So Far
-					</h2>
-					<p class="text-gray-500 max-w-2xl mx-auto">
-						Click on the markers to see where I've been
-					</p>
-				</div>
+						<div class="absolute inset-0 bg-gradient-to-br from-pink-50/30 to-blue-50/30"></div>
+						<img
+							src="/src/assets/world.svg"
+							alt="World Map"
+							class="w-full h-full object-cover opacity-60"
+						/>
 
-				<div
-					class="relative bg-white rounded-xl shadow-md overflow-hidden group"
-					style="height: 400px;"
-					id="draggable-map"
-				>
-					<img
-						src="/src/assets/world.svg"
-						alt="World Map"
-						class="w-full h-full object-cover opacity-30 select-none pointer-events-none"
-						draggable="false"
-					/>
+						<!-- Enhanced Map Markers -->
+						<div
+							class="map-marker pulse-animation"
+							style="top: 30%; left: 75%;"
+							data-location="New York, USA"
+							data-description="The city that never sleeps welcomed me with open arms"
+						>
+						</div>
+						<div
+							class="map-marker pulse-animation"
+							style="top: 40%; left: 50%;"
+							data-location="Paris, France"
+							data-description="Lost among the romantic streets and charming cafés"
+						>
+						</div>
+						<div
+							class="map-marker pulse-animation"
+							style="top: 60%; left: 70%;"
+							data-location="Bali, Indonesia"
+							data-description="Found peace among the rice terraces and temples"
+						>
+						</div>
+						<div
+							class="map-marker pulse-animation"
+							style="top: 35%; left: 85%;"
+							data-location="Tokyo, Japan"
+							data-description="Where tradition meets futuristic innovation"
+						>
+						</div>
+						<div
+							class="map-marker pulse-animation"
+							style="top: 55%; left: 60%;"
+							data-location="Cairo, Egypt"
+							data-description="Walked in the shadows of ancient pyramids"
+						>
+						</div>
+						<div
+							class="map-marker pulse-animation"
+							style="top: 25%; left: 55%;"
+							data-location="London, England"
+							data-description="Rainy days and cozy pubs stole my heart"
+						>
+						</div>
 
-					<!-- Map Markers -->
-					<div
-						class="map-marker"
-						style="top: 30%; left: 75%;"
-						data-location="New York"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 40%; left: 50%;"
-						data-location="Paris"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 60%; left: 70%;"
-						data-location="Bali"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 35%; left: 85%;"
-						data-location="Tokyo"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 55%; left: 60%;"
-						data-location="Cairo"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 25%; left: 55%;"
-						data-location="London"
-					></div>
-
-					<div class="map-tooltip"></div>
+						<div class="map-tooltip"></div>
+					</div>
 				</div>
 			</div>
 
-			<style>
-				@media (min-width: 1024px) {
-					#draggable-map {
-						height: 80vh !important;
-						min-height: 500px;
-						max-height: 900px;
-					}
-				}
-				.map-marker {
-					position: absolute;
-					width: 22px;
-					height: 22px;
-					background: #f472b6;
-					border: 2px solid #fff;
-					border-radius: 50%;
-					box-shadow: 0 2px 8px rgba(244, 114, 182, 0.2);
-					cursor: pointer;
-					transition: transform 0.15s, box-shadow 0.15s;
-					transform: translate(-50%, -50%);
-					z-index: 10;
-				}
-				.map-marker.active,
-				.map-marker:hover {
-					transform: translate(-50%, -50%) scale(1.2);
-					box-shadow: 0 4px 16px rgba(244, 114, 182, 0.4);
-				}
-				.map-tooltip {
-					position: absolute;
-					pointer-events: none;
-					background: #fff;
-					color: #f472b6;
-					padding: 6px 14px;
-					border-radius: 8px;
-					box-shadow: 0 2px 8px rgba(244, 114, 182, 0.15);
-					font-size: 1rem;
-					font-weight: 600;
-					opacity: 0;
-					transition: opacity 0.2s;
-					z-index: 20;
-					white-space: nowrap;
-				}
-			</style>
-
-			<script is:inline>
-				const map = document.getElementById("draggable-map");
-				let isDragging = false;
-				let startX, startY, scrollLeft, scrollTop;
-
-				function isLargeScreen() {
-					return window.innerWidth >= 1024;
-				}
-
-				function enableDrag() {
-					map.style.cursor = "grab";
-					map.addEventListener("mousedown", dragStart);
-					map.addEventListener("mouseleave", dragEnd);
-					map.addEventListener("mouseup", dragEnd);
-					map.addEventListener("mousemove", dragMove);
-					map.addEventListener("touchstart", dragStart, { passive: false });
-					map.addEventListener("touchend", dragEnd);
-					map.addEventListener("touchmove", dragMove, { passive: false });
-				}
-
-				function disableDrag() {
-					map.style.cursor = "default";
-					map.removeEventListener("mousedown", dragStart);
-					map.removeEventListener("mouseleave", dragEnd);
-					map.removeEventListener("mouseup", dragEnd);
-					map.removeEventListener("mousemove", dragMove);
-					map.removeEventListener("touchstart", dragStart);
-					map.removeEventListener("touchend", dragEnd);
-					map.removeEventListener("touchmove", dragMove);
-				}
-
-				function dragStart(e) {
-					if (isLargeScreen()) return;
-					isDragging = true;
-					map.style.cursor = "grabbing";
-					const evt = e.touches ? e.touches[0] : e;
-					startX = evt.pageX - map.offsetLeft;
-					startY = evt.pageY - map.offsetTop;
-					scrollLeft = map.scrollLeft;
-					scrollTop = map.scrollTop;
-					e.preventDefault();
-				}
-
-				function dragEnd() {
-					isDragging = false;
-					map.style.cursor = "grab";
-				}
-
-				function dragMove(e) {
-					if (!isDragging || isLargeScreen()) return;
-					const evt = e.touches ? e.touches[0] : e;
-					const x = evt.pageX - map.offsetLeft;
-					const y = evt.pageY - map.offsetTop;
-					map.scrollLeft = scrollLeft - (x - startX);
-					map.scrollTop = scrollTop - (y - startY);
-					e.preventDefault();
-				}
-
-				function updateMapBehavior() {
-					if (isLargeScreen()) {
-						disableDrag();
-						map.scrollLeft = 0;
-						map.scrollTop = 0;
-					} else {
-						enableDrag();
-					}
-				}
-
-				window.addEventListener("resize", updateMapBehavior);
-				window.addEventListener("DOMContentLoaded", () => {
-					updateMapBehavior();
-				});
-			</script>
-
 			<!-- Recent Posts -->
-			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-				<div class="text-center mb-12">
-					<h2
-						class="title-font text-3xl font-semibold text-pink-400 mb-2"
-					>
-						Latest Adventures
-					</h2>
-					<p class="text-gray-500 max-w-2xl mx-auto">
-						My most recent travel stories
-					</p>
-				</div>
+			<div class="relative bg-gradient-to-b from-pink-50 to-white py-20">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="text-center mb-16">
+						<h2
+							class="title-font text-4xl font-semibold text-pink-400 mb-4"
+						>
+							Latest Adventures
+						</h2>
+						<p class="text-gray-600 max-w-2xl mx-auto text-lg">
+							My most recent travel stories and discoveries
+						</p>
+					</div>
 
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 					<!-- Post 1 -->
 					<div
 						class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl"
@@ -344,72 +254,78 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 					</div>
 				</div>
 
-				<div class="text-center mt-12">
+				<div class="text-center mt-16">
 					<a
-						href="#"
-						class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-pink-400 hover:bg-pink-500 transition-colors duration-300"
+						href="/blog"
+						class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
 					>
 						View All Diary Entries
-						<i class="fas fa-book-open ml-2"></i>
+						<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+						</svg>
 					</a>
 				</div>
 			</div>
+		</div>
 
-			<!-- Newsletter -->
-			<div class="bg-pink-50">
-				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-					<div class="text-center">
-						<h2
-							class="title-font text-3xl font-semibold text-pink-400 mb-4"
-						>
-							Join My Travel Journey
-						</h2>
-						<p class="max-w-2xl mx-auto text-gray-600 mb-8">
-							Subscribe to get notified when I post new travel
-							stories and tips
-						</p>
+		<!-- Newsletter -->
+		<div class="relative bg-gradient-to-br from-pink-100 via-pink-50 to-white">
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+				<div class="text-center">
+					<h2
+						class="title-font text-4xl font-semibold text-pink-400 mb-6"
+					>
+						Join My Travel Journey
+					</h2>
+					<p class="max-w-3xl mx-auto text-gray-600 mb-12 text-lg">
+						Subscribe to get notified when I post new travel
+						stories, hidden gems, and travel tips from around the world
+					</p>
 
-						<form class="mt-8 sm:mx-auto sm:max-w-lg sm:flex">
-							<div class="min-w-0 flex-1">
-								<label for="email" class="sr-only"
-									>Email address</label
-								>
-								<input
-									id="email"
-									type="email"
-									placeholder="Enter your email"
-									class="block w-full px-5 py-3 text-base rounded-md border border-pink-300 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 placeholder-pink-300"
-								/>
-							</div>
-							<div class="mt-4 sm:mt-0 sm:ml-3">
-								<button
-									type="submit"
-									class="block w-full px-5 py-3 rounded-md shadow bg-pink-400 text-white font-medium hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 transition-colors duration-300"
-								>
-									Subscribe
-								</button>
-							</div>
-						</form>
+					<form class="mt-8 sm:mx-auto sm:max-w-lg sm:flex">
+						<div class="min-w-0 flex-1">
+							<label for="email" class="sr-only"
+								>Email address</label
+							>
+							<input
+								id="email"
+								type="email"
+								placeholder="Enter your email"
+								class="block w-full px-6 py-4 text-base rounded-full border-2 border-pink-200 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 placeholder-pink-300 transition-all duration-300"
+							/>
+						</div>
+						<div class="mt-4 sm:mt-0 sm:ml-4">
+							<button
+								type="submit"
+								class="block w-full px-8 py-4 rounded-full shadow-lg bg-pink-400 text-white font-medium hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-xl"
+							>
+								Subscribe
+							</button>
+						</div>
+					</form>
 
-						<p class="mt-3 text-sm text-gray-500">
-							I respect your privacy. Unsubscribe at any time.
-						</p>
-					</div>
+					<p class="mt-6 text-sm text-gray-500">
+						I respect your privacy. Unsubscribe at any time.
+					</p>
 				</div>
 			</div>
+		</div>
 		</main>
 		<Footer />
 
 		<script>
 			// Mobile menu toggle
-			document
-				.querySelector('[aria-controls="mobile-menu"]')
-				.addEventListener("click", function () {
+			const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
+			if (mobileMenuButton) {
+				mobileMenuButton.addEventListener("click", function () {
 					const menu = document.getElementById("mobile-menu");
-					menu.classList.toggle("hidden");
+					if (menu) {
+						menu.classList.toggle("hidden");
+					}
 				});
+			}
 
-			// Map marker interactions
+			// Enhanced map marker interactions
 			const markers = document.querySelectorAll(".map-marker");
 			const tooltip = document.querySelector(".map-tooltip");
 
@@ -423,19 +339,42 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
 					// Position and show tooltip
 					const location = this.getAttribute("data-location");
-					tooltip.textContent = location;
+					const description = this.getAttribute("data-description");
+					
+					if (tooltip && location) {
+						tooltip.innerHTML = `
+							<div class="font-semibold text-pink-600">${location}</div>
+							<div class="text-gray-600 text-xs mt-1">${description || ''}</div>
+						`;
 
-					const rect = this.getBoundingClientRect();
-					const mapRect = this.parentElement.getBoundingClientRect();
-
-					tooltip.style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
-					tooltip.style.top = `${rect.top - mapRect.top - 30}px`;
-					tooltip.style.opacity = "1";
+						const rect = this.getBoundingClientRect();
+						const mapRect = this.parentElement?.getBoundingClientRect();
+						
+						if (mapRect) {
+							(tooltip as HTMLElement).style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
+							(tooltip as HTMLElement).style.top = `${rect.top - mapRect.top - 50}px`;
+							(tooltip as HTMLElement).style.opacity = "1";
+							(tooltip as HTMLElement).style.transform = "translateX(-50%) translateY(0)";
+						}
+					}
 				});
 
 				marker.addEventListener("mouseleave", function () {
 					this.classList.remove("active");
-					tooltip.style.opacity = "0";
+					if (tooltip) {
+						(tooltip as HTMLElement).style.opacity = "0";
+						(tooltip as HTMLElement).style.transform = "translateX(-50%) translateY(-10px)";
+					}
+				});
+
+				// Add click functionality for mobile
+				marker.addEventListener("click", function () {
+					const location = this.getAttribute("data-location");
+					const description = this.getAttribute("data-description");
+					
+					if (location) {
+						alert(`${location}\n${description || ''}`);
+					}
 				});
 			});
 
@@ -443,13 +382,22 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 			document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 				anchor.addEventListener("click", function (e) {
 					e.preventDefault();
-
-					document
-						.querySelector(this.getAttribute("href"))
-						.scrollIntoView({
+					const target = document.querySelector(this.getAttribute("href") || '');
+					if (target) {
+						target.scrollIntoView({
 							behavior: "smooth",
 						});
+					}
 				});
+			});
+
+			// Add subtle parallax effect to hero section
+			window.addEventListener('scroll', () => {
+				const scrolled = window.pageYOffset;
+				const hero = document.querySelector('.bg-gradient-to-br');
+				if (hero) {
+					(hero as HTMLElement).style.transform = `translateY(${scrolled * 0.5}px)`;
+				}
 			});
 		</script>
 
