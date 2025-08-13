@@ -14,20 +14,33 @@ import cartoonArt from "../assets/cartoon-art.png";
 	<body>
 		<Header />
 		<main>
-			<div class="relative bg-gradient-to-b from-pink-50 to-white">
+			<!-- Hero Section -->
+			<div class="relative bg-gradient-to-br from-pink-50 via-white to-pink-25 min-h-[70vh] flex items-center">
+				<div class="absolute inset-0 bg-gradient-to-b from-transparent to-white/20"></div>
 				<div
-					class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20"
+					class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-20 w-full"
 				>
 					<div class="text-center">
 						<h1
-							class="title-font text-4xl md:text-5xl font-bold text-pink-400 mb-4"
+							class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight"
 						>
 							Nina's Travel Diary
 						</h1>
-						<p class="max-w-2xl mx-auto text-lg text-gray-600">
+						<p class="max-w-3xl mx-auto text-xl text-gray-600 leading-relaxed">
 							I am a girlie who wants to explore the world and remember her adventures
 							Maybe you will find some inspiration here too!
 						</p>
+						<div class="mt-8">
+							<a
+								href="#journey"
+								class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
+							>
+								Start Exploring
+								<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+								</svg>
+							</a>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -45,17 +58,16 @@ import cartoonArt from "../assets/cartoon-art.png";
 					</p>
 				</div>
 
-				<div
-					class="relative bg-white rounded-xl shadow-md overflow-hidden group"
-					style="height: 400px;"
-					id="draggable-map"
-				>
-					<img
-						src="/src/assets/world.svg"
-						alt="World Map"
-						class="w-full h-full object-cover opacity-30 select-none pointer-events-none"
-						draggable="false"
-					/>
+					<div
+						class="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-pink-100"
+						style="height: 500px;"
+					>
+						<div class="absolute inset-0 bg-gradient-to-br from-pink-50/30 to-blue-50/30"></div>
+						<img
+							src="/src/assets/world.svg"
+							alt="World Map"
+							class="w-full h-full object-cover opacity-60"
+						/>
 
 					<div
 						class="map-marker"
@@ -88,7 +100,8 @@ import cartoonArt from "../assets/cartoon-art.png";
 						data-location="London"
 					></div>
 
-					<div class="map-tooltip"></div>
+						<div class="map-tooltip"></div>
+					</div>
 				</div>
 			</div> -->
 
@@ -210,19 +223,20 @@ import cartoonArt from "../assets/cartoon-art.png";
 			</script>
 
 			<!-- Recent Posts -->
-			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-				<div class="text-center mb-12">
-					<h2
-						class="title-font text-3xl font-semibold text-pink-400 mb-2"
-					>
-						Latest Adventures
-					</h2>
-					<p class="text-gray-500 max-w-2xl mx-auto">
-						My most recent travel stories
-					</p>
-				</div>
+			<div class="relative bg-gradient-to-b from-pink-50 to-white py-20">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="text-center mb-16">
+						<h2
+							class="title-font text-4xl font-semibold text-pink-400 mb-4"
+						>
+							Latest Adventures
+						</h2>
+						<p class="text-gray-600 max-w-2xl mx-auto text-lg">
+							My most recent travel stories and discoveries
+						</p>
+					</div>
 
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 					<!-- Post 1 -->
 					<div
 						class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl"
@@ -344,16 +358,19 @@ import cartoonArt from "../assets/cartoon-art.png";
 					</div>
 				</div>
 
-				<div class="text-center mt-12">
+				<div class="text-center mt-16">
 					<a
-						href="#"
-						class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-pink-400 hover:bg-pink-500 transition-colors duration-300"
+						href="/blog"
+						class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
 					>
 						View All Diary Entries
-						<i class="fas fa-book-open ml-2"></i>
+						<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+						</svg>
 					</a>
 				</div>
 			</div>
+		</div>
 
 			<!-- Newsletter -->
 			<div class="bg-pink-50">
@@ -408,14 +425,17 @@ import cartoonArt from "../assets/cartoon-art.png";
 
 		<script>
 			// Mobile menu toggle
-			document
-				.querySelector('[aria-controls="mobile-menu"]')
-				.addEventListener("click", function () {
+			const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
+			if (mobileMenuButton) {
+				mobileMenuButton.addEventListener("click", function () {
 					const menu = document.getElementById("mobile-menu");
-					menu.classList.toggle("hidden");
+					if (menu) {
+						menu.classList.toggle("hidden");
+					}
 				});
+			}
 
-			// Map marker interactions
+			// Enhanced map marker interactions
 			const markers = document.querySelectorAll(".map-marker");
 			const tooltip = document.querySelector(".map-tooltip");
 
@@ -429,19 +449,42 @@ import cartoonArt from "../assets/cartoon-art.png";
 
 					// Position and show tooltip
 					const location = this.getAttribute("data-location");
-					tooltip.textContent = location;
+					const description = this.getAttribute("data-description");
+					
+					if (tooltip && location) {
+						tooltip.innerHTML = `
+							<div class="font-semibold text-pink-600">${location}</div>
+							<div class="text-gray-600 text-xs mt-1">${description || ''}</div>
+						`;
 
-					const rect = this.getBoundingClientRect();
-					const mapRect = this.parentElement.getBoundingClientRect();
-
-					tooltip.style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
-					tooltip.style.top = `${rect.top - mapRect.top - 30}px`;
-					tooltip.style.opacity = "1";
+						const rect = this.getBoundingClientRect();
+						const mapRect = this.parentElement?.getBoundingClientRect();
+						
+						if (mapRect) {
+							(tooltip as HTMLElement).style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
+							(tooltip as HTMLElement).style.top = `${rect.top - mapRect.top - 50}px`;
+							(tooltip as HTMLElement).style.opacity = "1";
+							(tooltip as HTMLElement).style.transform = "translateX(-50%) translateY(0)";
+						}
+					}
 				});
 
 				marker.addEventListener("mouseleave", function () {
 					this.classList.remove("active");
-					tooltip.style.opacity = "0";
+					if (tooltip) {
+						(tooltip as HTMLElement).style.opacity = "0";
+						(tooltip as HTMLElement).style.transform = "translateX(-50%) translateY(-10px)";
+					}
+				});
+
+				// Add click functionality for mobile
+				marker.addEventListener("click", function () {
+					const location = this.getAttribute("data-location");
+					const description = this.getAttribute("data-description");
+					
+					if (location) {
+						alert(`${location}\n${description || ''}`);
+					}
 				});
 			});
 
@@ -449,13 +492,22 @@ import cartoonArt from "../assets/cartoon-art.png";
 			document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
 				anchor.addEventListener("click", function (e) {
 					e.preventDefault();
-
-					document
-						.querySelector(this.getAttribute("href"))
-						.scrollIntoView({
+					const target = document.querySelector(this.getAttribute("href") || '');
+					if (target) {
+						target.scrollIntoView({
 							behavior: "smooth",
 						});
+					}
 				});
+			});
+
+			// Add subtle parallax effect to hero section
+			window.addEventListener('scroll', () => {
+				const scrolled = window.pageYOffset;
+				const hero = document.querySelector('.bg-gradient-to-br');
+				if (hero) {
+					(hero as HTMLElement).style.transform = `translateY(${scrolled * 0.5}px)`;
+				}
 			});
 		</script>
 
