@@ -3,6 +3,7 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import cartoonArt from "../assets/cartoon-art.png";
 ---
 
 <!doctype html>
@@ -24,15 +25,15 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 							Nina's Travel Diary
 						</h1>
 						<p class="max-w-2xl mx-auto text-lg text-gray-600">
-							Chronicles of a wanderlust soul exploring the world
-							one flight at a time
+							I am a girlie who wants to explore the world and remember her adventures
+							Maybe you will find some inspiration here too!
 						</p>
 					</div>
 				</div>
 			</div>
 
 			<!-- Travel Map Section -->
-			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+			<!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 				<div class="text-center mb-12">
 					<h2
 						class="title-font text-3xl font-semibold text-pink-400 mb-2"
@@ -56,7 +57,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 						draggable="false"
 					/>
 
-					<!-- Map Markers -->
 					<div
 						class="map-marker"
 						style="top: 30%; left: 75%;"
@@ -90,7 +90,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 
 					<div class="map-tooltip"></div>
 				</div>
-			</div>
+			</div> -->
 
 			<style>
 				@media (min-width: 1024px) {
@@ -358,43 +358,49 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 			<!-- Newsletter -->
 			<div class="bg-pink-50">
 				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-					<div class="text-center">
-						<h2
-							class="title-font text-3xl font-semibold text-pink-400 mb-4"
-						>
-							Join My Travel Journey
-						</h2>
-						<p class="max-w-2xl mx-auto text-gray-600 mb-8">
-							Subscribe to get notified when I post new travel
-							stories and tips
-						</p>
-
-						<form class="mt-8 sm:mx-auto sm:max-w-lg sm:flex">
-							<div class="min-w-0 flex-1">
-								<label for="email" class="sr-only"
-									>Email address</label
-								>
-								<input
-									id="email"
-									type="email"
-									placeholder="Enter your email"
-									class="block w-full px-5 py-3 text-base rounded-md border border-pink-300 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 placeholder-pink-300"
-								/>
-							</div>
-							<div class="mt-4 sm:mt-0 sm:ml-3">
-								<button
-									type="submit"
-									class="block w-full px-5 py-3 rounded-md shadow bg-pink-400 text-white font-medium hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 transition-colors duration-300"
-								>
-									Subscribe
-								</button>
-							</div>
-						</form>
-
-						<p class="mt-3 text-sm text-gray-500">
-							I respect your privacy. Unsubscribe at any time.
-						</p>
+					<div class="flex flex-col md:flex-row items-center justify-center gap-8 mb-8">
+						<img
+							src={cartoonArt.src}
+							alt="Nina's cartoon avatar"
+							class="w-24 h-24 md:w-32 md:h-32 rounded-full shadow-lg border-4 border-white"
+						/>
+						<div class="text-center md:text-left">
+							<h2
+								class="title-font text-3xl font-semibold text-pink-400 mb-2"
+							>
+								Join My Travel Journey
+							</h2>
+							<p class="text-gray-600 max-w-lg">
+								Subscribe to get notified when I post new travel stories and tips
+							</p>
+						</div>
 					</div>
+
+					<form class="mt-8 sm:mx-auto sm:max-w-lg sm:flex">
+						<div class="min-w-0 flex-1">
+							<label for="email" class="sr-only"
+								>Email address</label
+							>
+							<input
+								id="email"
+								type="email"
+								placeholder="Enter your email"
+								class="block w-full px-5 py-3 text-base rounded-md border border-pink-300 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 placeholder-pink-300"
+							/>
+						</div>
+						<div class="mt-4 sm:mt-0 sm:ml-3">
+							<button
+								type="submit"
+								class="block w-full px-5 py-3 rounded-md shadow bg-pink-400 text-white font-medium hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 transition-colors duration-300"
+							>
+								Subscribe
+							</button>
+						</div>
+					</form>
+
+					<p class="mt-3 text-sm text-gray-500 text-center">
+						I respect your privacy. Unsubscribe at any time.
+					</p>
 				</div>
 			</div>
 		</main>
