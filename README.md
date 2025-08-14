@@ -13,4 +13,4 @@ npm run dev
 
 Then visit [http://localhost:4321](http://localhost:4321) in your browser.
 
-Enjoy exploring the world with Nina!
+Enjoy exploring the world with Nina!!
