@@ -9,7 +9,8 @@
     "astro": "astro",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "tsx src/db/seed.ts"
   },
   "dependencies": {
     "@astrojs/mdx": "^4.3.0",
@@ -24,6 +25,7 @@
     "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "^7.6.13"
+    "@types/better-sqlite3": "^7.6.13",
+    "tsx": "^4.20.4"
   }
 }

@@ -1,0 +1,110 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+import { db } from '../../db';
+import { continent, country, location, post } from '../../db/schema';
+import { eq, and } from 'drizzle-orm';
+import { getCountryDescription, getCountryFlag } from '../../config/countries';
+
+// Get all posts for France
+const francePosts = await db
+  .select({
+    postId: post.id,
+    postTitle: post.title,
+    postStartDate: post.startDate,
+    postEndDate: post.endDate,
+    postCreatedAt: post.createdAt,
+    postIsPublished: post.isPublished,
+    locationName: location.name,
+  })
+  .from(continent)
+  .innerJoin(country, eq(country.continentId, continent.id))
+  .innerJoin(location, eq(location.countryId, country.id))
+  .innerJoin(post, eq(post.locationId, location.id))
+  .where(and(
+    eq(continent.name, 'Europe'),
+    eq(country.name, 'France')
+  ))
+  .all();
+
+console.log('France posts:', francePosts);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<BaseHead title={`France - ${SITE_TITLE}`} description="My travels and adventures in France" />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+				<!-- Page Header -->
+				<div class="text-center mb-12">
+					<h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
+						{getCountryFlag('France')} France
+					</h1>
+					<p class="text-gray-600 max-w-4xl mx-auto">
+						{getCountryDescription('France')}
+					</p>
+				</div>
+
+				<!-- Posts Grid -->
+				{francePosts.length > 0 ? (
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+						{francePosts.map((postData) => (
+							<div class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+								<div class="h-48 overflow-hidden bg-gradient-to-br from-pink-100 to-blue-100">
+									<div class="w-full h-full flex items-center justify-center">
+										<div class="text-center">
+											<i class="fas fa-camera text-4xl text-pink-400 mb-2"></i>
+											<p class="text-gray-600 text-sm">Photo coming soon</p>
+										</div>
+									</div>
+								</div>
+								<div class="p-6">
+									<div class="flex items-center text-sm text-pink-400 mb-2">
+										<i class="fas fa-map-marker-alt mr-1"></i>
+										<span>{postData.locationName}</span>
+										{postData.postCreatedAt && (
+											<>
+												<span class="mx-2">•</span>
+												<span>{new Date(postData.postCreatedAt).toLocaleDateString()}</span>
+											</>
+										)}
+									</div>
+									<h3 class="title-font text-xl font-semibold text-gray-800 mb-3">
+										{postData.postTitle}
+									</h3>
+									<p class="text-gray-600 mb-4">
+										Read about my experiences and discoveries in this beautiful location in France.
+									</p>
+									<a
+										href={`/blog/post-${postData.postId}`}
+										class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200"
+									>
+										Read more
+										<i class="fas fa-arrow-right ml-2"></i>
+									</a>
+								</div>
+							</div>
+						))}
+					</div>
+				) : (
+					<div class="text-center py-12">
+						<div class="text-gray-400 mb-4">
+							<i class="fas fa-camera text-6xl"></i>
+						</div>
+						<h3 class="text-xl font-semibold text-gray-600 mb-2">No France Adventures Yet</h3>
+						<p class="text-gray-500">
+							I haven't shared any stories from France yet, but stay tuned for upcoming adventures!
+						</p>
+					</div>
+				)}
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

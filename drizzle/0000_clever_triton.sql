@@ -37,14 +37,16 @@ CREATE TABLE `posts` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`title` text NOT NULL,
 	`location_id` integer NOT NULL,
-	`travel_id` integer NOT NULL,
+	`travel_id` integer,
+	`plan_id` integer,
 	`start_date` text,
 	`end_date` text,
 	`created_at` text NOT NULL,
 	`updated_at` text,
 	`is_published` integer DEFAULT 0 NOT NULL,
 	FOREIGN KEY (`location_id`) REFERENCES `locations`(`id`) ON UPDATE no action ON DELETE cascade,
-	FOREIGN KEY (`travel_id`) REFERENCES `travels`(`id`) ON UPDATE no action ON DELETE cascade
+	FOREIGN KEY (`travel_id`) REFERENCES `travels`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`plan_id`) REFERENCES `plans`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `post_tags` (

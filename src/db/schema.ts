@@ -66,7 +66,9 @@ export const post = sqliteTable('posts', {
     locationId: integer('location_id')
         .references(() => location.id, { onDelete: 'cascade' }).notNull(),
     travelId: integer('travel_id')
-        .references(() => travel.id, { onDelete: 'cascade' }).notNull(),
+        .references(() => travel.id, { onDelete: 'cascade' }), // Optional - for posts about completed travels
+    planId: integer('plan_id')
+        .references(() => plans.id, { onDelete: 'cascade' }), // Optional - for posts about future plans
     startDate: text('start_date'),
     endDate: text('end_date'),
     createdAt: text('created_at').notNull(),
