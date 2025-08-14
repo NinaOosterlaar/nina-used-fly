@@ -8,15 +8,16 @@ import { getCollection } from 'astro:content';
 import { url } from "../utils/url";
 import { resolveImageUrl } from "../utils/image";
 
-// Get all blog posts and select a random one
+// Get all blog posts
 const allPosts = await getCollection('blog');
-const randomPost = allPosts[Math.floor(Math.random() * allPosts.length)];
-const randomPostUrl = url(`/blog/${randomPost.id.replace(/\.(md|mdx)$/, '')}`);
 
 // Get the 3 most recent posts sorted by publication date
 const recentPosts = allPosts
   .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
   .slice(0, 3);
+
+// Prepare all post URLs for client-side random selection
+const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`));
 ---
 
 <!doctype html>
@@ -44,15 +45,15 @@ const recentPosts = allPosts
 							Maybe you will find some inspiration here too!
 						</p>
 						<div class="mt-8">
-							<a
-								href={randomPostUrl}
-								class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
+							<button
+								id="randomPostBtn"
+								class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1 cursor-pointer"
 							>
 								Get Random Post
 								<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4l8 8-8 8M4 12h16"></path>
 								</svg>
-							</a>
+							</button>
 						</div>
 						
 						
@@ -504,6 +505,20 @@ const recentPosts = allPosts
 					subscribeBtn: !!subscribeBtn
 				});
 			}
+		</script>
+
+		<script is:inline define:vars={{ allPostUrls }}>
+			// Random post functionality
+			document.addEventListener('DOMContentLoaded', () => {
+				const randomBtn = document.getElementById('randomPostBtn');
+				if (randomBtn && allPostUrls.length > 0) {
+					randomBtn.addEventListener('click', () => {
+						const randomIndex = Math.floor(Math.random() * allPostUrls.length);
+						const randomUrl = allPostUrls[randomIndex];
+						window.location.href = randomUrl;
+					});
+				}
+			});
 		</script>
 
 		<!-- <script is:inline>
