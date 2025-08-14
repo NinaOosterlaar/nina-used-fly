@@ -6,6 +6,7 @@ import { SITE_TITLE } from '../../consts';
 import { getCountryDescription, getCountryFlag } from '../../config/countries';
 import { getEnrichedPostsForCountry } from '../../utils/blog-db';
 import { url } from '../../utils/url';
+import { resolveImageUrl } from '../../utils/image';
 
 // Get all enriched posts for Belgium (with markdown frontmatter)
 const belgiumPosts = await getEnrichedPostsForCountry('Belgium');
@@ -43,7 +44,7 @@ console.log('Belgium posts:', belgiumPosts);
 								<div class="h-48 overflow-hidden">
 									{postData.markdownData?.heroImage ? (
 										<img 
-											src={postData.markdownData.heroImage} 
+											src={resolveImageUrl(postData.markdownData.heroImage)} 
 											alt={postData.title}
 											class="w-full h-full object-cover"
 										/>

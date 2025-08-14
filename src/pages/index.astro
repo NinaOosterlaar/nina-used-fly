@@ -6,6 +6,7 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import cartoonArt from "../assets/cartoon-art.png";
 import { getCollection } from 'astro:content';
 import { url } from "../utils/url";
+import { resolveImageUrl } from "../utils/image";
 
 // Get all blog posts and select a random one
 const allPosts = await getCollection('blog');
@@ -259,7 +260,7 @@ const recentPosts = allPosts
 								<div class="h-48 overflow-hidden">
 									{post.data.heroImage ? (
 										<img
-											src={post.data.heroImage.src}
+											src={resolveImageUrl(post.data.heroImage.src)}
 											alt={post.data.title}
 											class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
 										/>
