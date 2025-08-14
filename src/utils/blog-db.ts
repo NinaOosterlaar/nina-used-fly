@@ -242,7 +242,7 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
       if (matchingMarkdown) {
         enrichedPost.markdownData = {
           description: matchingMarkdown.data.description,
-          heroImage: matchingMarkdown.data.heroImage?.src,
+          heroImage: matchingMarkdown.data.heroImage,
           pubDate: matchingMarkdown.data.pubDate,
           slug: matchingMarkdown.id,
           url: `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
