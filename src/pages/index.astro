@@ -5,11 +5,12 @@ import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import cartoonArt from "../assets/cartoon-art.png";
 import { getCollection } from 'astro:content';
+import { url } from "../utils/url";
 
 // Get all blog posts and select a random one
 const allPosts = await getCollection('blog');
 const randomPost = allPosts[Math.floor(Math.random() * allPosts.length)];
-const randomPostUrl = `/blog/${randomPost.id.replace(/\.(md|mdx)$/, '')}`;
+const randomPostUrl = url(`/blog/${randomPost.id.replace(/\.(md|mdx)$/, '')}`);
 
 // Get the 3 most recent posts sorted by publication date
 const recentPosts = allPosts
@@ -252,7 +253,7 @@ const recentPosts = allPosts
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 						{recentPosts.map((post) => (
 							<a 
-								href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`}
+								href={url(`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`)}
 								class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
 							>
 								<div class="h-48 overflow-hidden">
@@ -293,7 +294,7 @@ const recentPosts = allPosts
 
 				<div class="text-center mt-16">
 					<a
-						href="/blog"
+						href={url("/blog")}
 						class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
 					>
 						View All Adventures
@@ -458,7 +459,11 @@ const recentPosts = allPosts
 					subscribeBtn.disabled = true;
 
 					try {
-						const response = await fetch('/api/subscribe', {
+						// Get current base path from URL
+						const basePath = window.location.pathname.includes('/nina-used-fly') ? '/nina-used-fly' : '';
+						const apiUrl = `${basePath}/api/subscribe`;
+						
+						const response = await fetch(apiUrl, {
 							method: 'POST',
 							headers: {
 								'Content-Type': 'application/json',
@@ -479,6 +484,7 @@ const recentPosts = allPosts
 							messageText.className = 'text-sm text-red-600';
 						}
 					} catch (error) {
+						console.error('Subscription error:', error);
 						// Show error message
 						messageDiv.classList.remove('hidden');
 						messageText.textContent = 'Something went wrong. Please try again later.';
@@ -488,6 +494,13 @@ const recentPosts = allPosts
 						subscribeBtn.textContent = 'Subscribe';
 						subscribeBtn.disabled = false;
 					}
+				});
+			} else {
+				console.error('Newsletter form elements not found:', {
+					newsletterForm: !!newsletterForm,
+					messageDiv: !!messageDiv,
+					messageText: !!messageText,
+					subscribeBtn: !!subscribeBtn
 				});
 			}
 		</script>

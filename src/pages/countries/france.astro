@@ -5,6 +5,7 @@ import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { getCountryDescription, getCountryFlag } from '../../config/countries';
 import { getEnrichedPostsForCountry } from '../../utils/blog-db';
+import { url } from '../../utils/url';
 
 // Get all enriched posts for France (with markdown frontmatter)
 const francePosts = await getEnrichedPostsForCountry('France');
@@ -36,7 +37,7 @@ console.log('France posts:', francePosts);
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 						{francePosts.map((postData) => (
 							<a 
-								href={postData.markdownData?.url || `/blog/post-${postData.id}`}
+								href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
 								class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
 							>
 								<div class="h-48 overflow-hidden">

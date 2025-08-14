@@ -6,7 +6,8 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://example.com',
+	site: 'https://ninaoosterlaar.github.io',
+	base: '/nina-used-fly',
 	integrations: [mdx(), sitemap()],
 	vite: {
 		plugins: [tailwindcss()],

@@ -1,6 +1,7 @@
 ---
 const today = new Date();
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { url } from "../utils/url";
 ---
 
 <footer class="bg-white">
@@ -42,25 +43,25 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 					<ul class="mt-4 space-y-2">
 						<li>
 							<a
-								href="/"
+								href={url("/")}
 								class="text-gray-500 hover:text-pink-500"
 								>Home</a>
 						</li>
 						<li>
 							<a
-								href="/travels"
+								href={url("/travels")}
 								class="text-gray-500 hover:text-pink-500"
 								>Travels</a>
 						</li>
 						<li>
 							<a
-								href="/plans"
+								href={url("/plans")}
 								class="text-gray-500 hover:text-pink-500"
 								>Plans</a>
 						</li>
 						<li>
 							<a
-								href="/about"
+								href={url("/about")}
 								class="text-gray-500 hover:text-pink-500"
 								>About</a>
 						</li>
@@ -76,13 +77,13 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 					<ul class="mt-4 space-y-2">
 						<li>
 							<a
-								href="/continents/europe"
+								href={url("/continents/europe")}
 								class="text-gray-500 hover:text-pink-500"
 								>Europe</a>
 						</li>
 						<li>
 							<a
-								href="/continents/asia"
+								href={url("/continents/asia")}
 								class="text-gray-500 hover:text-pink-500"
 								>Asia</a>
 						</li>

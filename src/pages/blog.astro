@@ -4,6 +4,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_TITLE } from "../consts";
 import { getCollection } from 'astro:content';
+import { url } from "../utils/url";
 
 // Get all blog posts sorted by publication date (newest first)
 const allPosts = await getCollection('blog');
@@ -42,7 +43,7 @@ const sortedPosts = allPosts.sort((a, b) =>
 				<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 					{sortedPosts.map((post) => (
 						<a 
-							href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`}
+							href={url(`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`)}
 							class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block"
 						>
 							<div class="h-48 overflow-hidden">
