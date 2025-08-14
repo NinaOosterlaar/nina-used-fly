@@ -4,6 +4,17 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import cartoonArt from "../assets/cartoon-art.png";
+import { getCollection } from 'astro:content';
+
+// Get all blog posts and select a random one
+const allPosts = await getCollection('blog');
+const randomPost = allPosts[Math.floor(Math.random() * allPosts.length)];
+const randomPostUrl = `/blog/${randomPost.id.replace(/\.(md|mdx)$/, '')}`;
+
+// Get the 3 most recent posts sorted by publication date
+const recentPosts = allPosts
+  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+  .slice(0, 3);
 ---
 
 <!doctype html>
@@ -32,44 +43,17 @@ import cartoonArt from "../assets/cartoon-art.png";
 						</p>
 						<div class="mt-8">
 							<a
-								href="#latest-posts"
+								href={randomPostUrl}
 								class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
 							>
-								Start Exploring
+								Get Random Post
 								<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4l8 8-8 8M4 12h16"></path>
 								</svg>
 							</a>
 						</div>
-						<video 
-							width="480" 
-							height="192" 
-							autoplay 
-							loop 
-							muted 
-							playsinline
-							class="mx-auto mt-8 rounded-lg"
-						>
-							<source src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.mp4" type="video/mp4">
-							<source src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.webm" type="video/webm">
-							<!-- Fallback to GIF for older browsers -->
-							<img src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.gif" alt="Sad Pokemon" width="480" height="192" />
-						</video>
 						
-						<video 
-							width="480" 
-							height="192" 
-							autoplay 
-							loop 
-							muted 
-							playsinline
-							class="mx-auto mt-4 rounded-lg"
-						>
-							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.mp4" type="video/mp4">
-							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.webm" type="video/webm">
-							<!-- Fallback to GIF for older browsers -->
-							<img src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.gif" alt="Clefairy Pokemon" width="480" height="192" />
-						</video>
+						
 					</div>
 				</div>
 			</div>
@@ -266,133 +250,53 @@ import cartoonArt from "../assets/cartoon-art.png";
 					</div>
 
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-					<!-- Post 1 -->
-					<div
-						class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl"
-					>
-						<div class="h-48 overflow-hidden">
-							<img
-								src="https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
-								alt="Bali Sunset"
-								class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-							/>
-						</div>
-						<div class="p-6">
-							<div
-								class="flex items-center text-sm text-pink-400 mb-2"
+						{recentPosts.map((post) => (
+							<a 
+								href={`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`}
+								class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
 							>
-								<i class="fas fa-map-marker-alt mr-1"></i>
-								<span>Bali, Indonesia</span>
-								<span class="mx-2">•</span>
-								<span>May 15, 2023</span>
-							</div>
-							<h3
-								class="title-font text-xl font-semibold text-gray-800 mb-3"
-							>
-								Chasing Sunsets in Uluwatu
-							</h3>
-							<p class="text-gray-500 mb-4">
-								The cliffs of Uluwatu offered the most
-								breathtaking sunset views I've ever witnessed.
-								The way the golden light danced on the waves...
-							</p>
-							<a
-								href="#"
-								class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium"
-							>
-								Read more
-								<i class="fas fa-arrow-right ml-2"></i>
+								<div class="h-48 overflow-hidden">
+									{post.data.heroImage ? (
+										<img
+											src={post.data.heroImage.src}
+											alt={post.data.title}
+											class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+										/>
+									) : (
+										<div class="w-full h-full bg-gradient-to-br from-pink-100 to-blue-100 flex items-center justify-center">
+											<div class="text-center">
+												<i class="fas fa-camera text-4xl text-pink-400 mb-2"></i>
+												<p class="text-gray-600 text-sm">Photo coming soon</p>
+											</div>
+										</div>
+									)}
+								</div>
+								<div class="p-6">
+									<div class="flex items-center text-sm text-pink-400 mb-2">
+										<i class="fas fa-calendar mr-1"></i>
+										<span>{new Date(post.data.pubDate).toLocaleDateString('en-GB')}</span>
+									</div>
+									<h3 class="title-font text-xl font-semibold text-gray-800 mb-3">
+										{post.data.title}
+									</h3>
+									<p class="text-gray-500 mb-4">
+										{post.data.description}
+									</p>
+									<div class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium">
+										Read more
+										<i class="fas fa-arrow-right ml-2"></i>
+									</div>
+								</div>
 							</a>
-						</div>
+						))}
 					</div>
-
-					<!-- Post 2 -->
-					<div
-						class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl"
-					>
-						<div class="h-48 overflow-hidden">
-							<img
-								src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1473&q=80"
-								alt="Paris Streets"
-								class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-							/>
-						</div>
-						<div class="p-6">
-							<div
-								class="flex items-center text-sm text-pink-400 mb-2"
-							>
-								<i class="fas fa-map-marker-alt mr-1"></i>
-								<span>Paris, France</span>
-								<span class="mx-2">•</span>
-								<span>March 22, 2023</span>
-							</div>
-							<h3
-								class="title-font text-xl font-semibold text-gray-800 mb-3"
-							>
-								A Rainy Day in Montmartre
-							</h3>
-							<p class="text-gray-500 mb-4">
-								There's something magical about Paris in the
-								rain. The cobblestone streets of Montmartre
-								glistened as I wandered from café to café...
-							</p>
-							<a
-								href="#"
-								class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium"
-							>
-								Read more
-								<i class="fas fa-arrow-right ml-2"></i>
-							</a>
-						</div>
-					</div>
-
-					<!-- Post 3 -->
-					<div
-						class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl"
-					>
-						<div class="h-48 overflow-hidden">
-							<img
-								src="https://images.unsplash.com/photo-1492571350019-22de08371fd3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1453&q=80"
-								alt="Tokyo Streets"
-								class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-							/>
-						</div>
-						<div class="p-6">
-							<div
-								class="flex items-center text-sm text-pink-400 mb-2"
-							>
-								<i class="fas fa-map-marker-alt mr-1"></i>
-								<span>Tokyo, Japan</span>
-								<span class="mx-2">•</span>
-								<span>January 8, 2023</span>
-							</div>
-							<h3
-								class="title-font text-xl font-semibold text-gray-800 mb-3"
-							>
-								Lost in Translation in Shibuya
-							</h3>
-							<p class="text-gray-500 mb-4">
-								Navigating the neon-lit streets of Shibuya with
-								my limited Japanese was both challenging and
-								exhilarating. The energy of this city is...
-							</p>
-							<a
-								href="#"
-								class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium"
-							>
-								Read more
-								<i class="fas fa-arrow-right ml-2"></i>
-							</a>
-						</div>
-					</div>
-				</div>
 
 				<div class="text-center mt-16">
 					<a
 						href="/blog"
 						class="inline-flex items-center px-8 py-4 border border-transparent text-lg font-medium rounded-full shadow-lg text-white bg-pink-400 hover:bg-pink-500 transition-all duration-300 hover:shadow-xl transform hover:-translate-y-1"
 					>
-						View All Diary Entries
+						View All Adventures
 						<svg class="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
 						</svg>
@@ -422,14 +326,16 @@ import cartoonArt from "../assets/cartoon-art.png";
 						</div>
 					</div>
 
-					<form class="mt-8 sm:mx-auto sm:max-w-lg sm:flex">
+					<form id="newsletter-form" class="mt-8 sm:mx-auto sm:max-w-lg sm:flex">
 						<div class="min-w-0 flex-1">
 							<label for="email" class="sr-only"
 								>Email address</label
 							>
 							<input
 								id="email"
+								name="email"
 								type="email"
+								required
 								placeholder="Enter your email"
 								class="block w-full px-5 py-3 text-base rounded-md border border-pink-300 bg-white text-gray-800 shadow-sm focus:ring-2 focus:ring-pink-300 focus:border-pink-400 placeholder-pink-300"
 							/>
@@ -437,12 +343,17 @@ import cartoonArt from "../assets/cartoon-art.png";
 						<div class="mt-4 sm:mt-0 sm:ml-3">
 							<button
 								type="submit"
+								id="subscribe-btn"
 								class="block w-full px-5 py-3 rounded-md shadow bg-pink-400 text-white font-medium hover:bg-pink-500 focus:outline-none focus:ring-2 focus:ring-pink-300 focus:ring-offset-2 transition-colors duration-300"
 							>
 								Subscribe
 							</button>
 						</div>
 					</form>
+
+					<div id="form-message" class="mt-4 text-center hidden">
+						<p id="message-text" class="text-sm"></p>
+					</div>
 
 					<p class="mt-3 text-sm text-gray-500 text-center">
 						I respect your privacy. Unsubscribe at any time.
@@ -452,18 +363,7 @@ import cartoonArt from "../assets/cartoon-art.png";
 		</main>
 		<Footer />
 
-		<script>
-			// Mobile menu toggle
-			const mobileMenuButton = document.querySelector('[aria-controls="mobile-menu"]');
-			if (mobileMenuButton) {
-				mobileMenuButton.addEventListener("click", function () {
-					const menu = document.getElementById("mobile-menu");
-					if (menu) {
-						menu.classList.toggle("hidden");
-					}
-				});
-			}
-
+		<script is:inline>
 			// Enhanced map marker interactions
 			const markers = document.querySelectorAll(".map-marker");
 			const tooltip = document.querySelector(".map-tooltip");
@@ -490,10 +390,10 @@ import cartoonArt from "../assets/cartoon-art.png";
 						const mapRect = this.parentElement?.getBoundingClientRect();
 						
 						if (mapRect) {
-							(tooltip as HTMLElement).style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
-							(tooltip as HTMLElement).style.top = `${rect.top - mapRect.top - 50}px`;
-							(tooltip as HTMLElement).style.opacity = "1";
-							(tooltip as HTMLElement).style.transform = "translateX(-50%) translateY(0)";
+							tooltip.style.left = `${rect.left - mapRect.left + rect.width / 2}px`;
+							tooltip.style.top = `${rect.top - mapRect.top - 50}px`;
+							tooltip.style.opacity = "1";
+							tooltip.style.transform = "translateX(-50%) translateY(0)";
 						}
 					}
 				});
@@ -501,8 +401,8 @@ import cartoonArt from "../assets/cartoon-art.png";
 				marker.addEventListener("mouseleave", function () {
 					this.classList.remove("active");
 					if (tooltip) {
-						(tooltip as HTMLElement).style.opacity = "0";
-						(tooltip as HTMLElement).style.transform = "translateX(-50%) translateY(-10px)";
+						tooltip.style.opacity = "0";
+						tooltip.style.transform = "translateX(-50%) translateY(-10px)";
 					}
 				});
 
@@ -535,9 +435,61 @@ import cartoonArt from "../assets/cartoon-art.png";
 				const scrolled = window.pageYOffset;
 				const hero = document.querySelector('.bg-gradient-to-br');
 				if (hero) {
-					(hero as HTMLElement).style.transform = `translateY(${scrolled * 0.5}px)`;
+					hero.style.transform = `translateY(${scrolled * 0.5}px)`;
 				}
 			});
+
+			// Newsletter form submission
+			const newsletterForm = document.getElementById('newsletter-form');
+			const messageDiv = document.getElementById('form-message');
+			const messageText = document.getElementById('message-text');
+			const subscribeBtn = document.getElementById('subscribe-btn');
+
+			if (newsletterForm && messageDiv && messageText && subscribeBtn) {
+				newsletterForm.addEventListener('submit', async (e) => {
+					e.preventDefault();
+					
+					// Get email value
+					const emailInput = newsletterForm.querySelector('input[name="email"]');
+					const emailValue = emailInput ? emailInput.value : '';
+					
+					// Update button state
+					subscribeBtn.textContent = 'Subscribing...';
+					subscribeBtn.disabled = true;
+
+					try {
+						const response = await fetch('/api/subscribe', {
+							method: 'POST',
+							headers: {
+								'Content-Type': 'application/json',
+							},
+							body: JSON.stringify({ email: emailValue })
+						});
+
+						const result = await response.json();
+						
+						// Show message
+						messageDiv.classList.remove('hidden');
+						messageText.textContent = result.message;
+						
+						if (result.success) {
+							messageText.className = 'text-sm text-green-600';
+							newsletterForm.reset();
+						} else {
+							messageText.className = 'text-sm text-red-600';
+						}
+					} catch (error) {
+						// Show error message
+						messageDiv.classList.remove('hidden');
+						messageText.textContent = 'Something went wrong. Please try again later.';
+						messageText.className = 'text-sm text-red-600';
+					} finally {
+						// Reset button state
+						subscribeBtn.textContent = 'Subscribe';
+						subscribeBtn.disabled = false;
+					}
+				});
+			}
 		</script>
 
 		<!-- <script is:inline>

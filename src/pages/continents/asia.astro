@@ -90,7 +90,20 @@ const defaultImage = fidoughImage.src;
 				) : (
 					<div class="text-center py-12">
 						<div class="text-gray-400 mb-4">
-							<img src={sadPikachuImage.src} alt="Sad Pikachu" class="h-64 mx-auto object-contain" />
+							<video 
+							width="480" 
+							autoplay 
+							loop 
+							muted 
+							playsinline
+							class="mx-auto rounded-lg"
+							style="aspect-ratio: auto;"
+						>
+							<source src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.mp4" type="video/mp4">
+							<source src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.webm" type="video/webm">
+							<!-- Fallback to GIF for older browsers -->
+							<img src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.gif" alt="Sad Pokemon" width="480" style="aspect-ratio: auto;" />
+						</video>
 						</div>
 						<h3 class="text-xl font-semibold text-gray-600 mb-2">No Asian Adventures Yet</h3>
 						<p class="text-gray-500">

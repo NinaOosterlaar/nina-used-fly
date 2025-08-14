@@ -7,6 +7,72 @@ body {
 	color: #5a4a4a;
 }
 
+/* Blog post typography - override Tailwind resets */
+.prose h1:not(.title h1) {
+	font-family: 'Playfair Display', serif;
+	font-size: 2.5em;
+	font-weight: 600;
+	margin: 1.5em 0 0.5em 0;
+	line-height: 1.2;
+	color: #f472b6;
+	display: block;
+}
+
+.prose h2 {
+	font-family: 'Playfair Display', serif;
+	font-size: 2em;
+	font-weight: 600;
+	margin: 1.3em 0 0.5em 0;
+	line-height: 1.3;
+	color: #f472b6;
+	display: block;
+}
+
+.prose h3 {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.5em;
+	font-weight: 600;
+	margin: 1.2em 0 0.5em 0;
+	line-height: 1.4;
+	color: #f472b6;
+	display: block;
+}
+
+.prose h4 {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.25em;
+	font-weight: 600;
+	margin: 1em 0 0.5em 0;
+	line-height: 1.4;
+	color: #f472b6;
+	display: block;
+}
+
+.prose h5 {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.1em;
+	font-weight: 600;
+	margin: 1em 0 0.5em 0;
+	line-height: 1.4;
+	color: #f472b6;
+	display: block;
+}
+
+.prose h6 {
+	font-family: 'Playfair Display', serif;
+	font-size: 1em;
+	font-weight: 600;
+	margin: 1em 0 0.5em 0;
+	line-height: 1.4;
+	color: #f472b6;
+	display: block;
+}
+
+.prose p {
+	margin: 1em 0;
+	line-height: 1.6;
+}
+
 .title-font {
 	font-family: 'Playfair Display', serif;
 }

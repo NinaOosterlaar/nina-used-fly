@@ -1,56 +1,271 @@
 ---
-import type { CollectionEntry } from 'astro:content';
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import FormattedDate from '../components/FormattedDate.astro';
-import { Image } from 'astro:assets';
+import type { CollectionEntry } from "astro:content";
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import { Image } from "astro:assets";
+import {
+	getBlogPostByTitle,
+	markPostAsPublished,
+	linkPostToTravel,
+	type BlogPostMetadata,
+} from "../utils/blog-db";
 
-type Props = CollectionEntry<'blog'>['data'];
+type Props = CollectionEntry<"blog">["data"];
 
 const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+
+// Get the folder path from the current URL for travel linking
+const currentPath = Astro.url.pathname;
+const folderPath = currentPath.split("/").slice(-2, -1)[0]; // Get the folder name
+
+console.log(`Processing blog post: ${title}`);
+console.log(`Folder path: ${folderPath}`);
+
+// Fetch metadata from database
+let dbMetadata: BlogPostMetadata | null = null;
+try {
+	dbMetadata = await getBlogPostByTitle(title, folderPath);
+
+	// Link to travel if we have a folder path and the post exists
+	if (dbMetadata && folderPath && folderPath !== "blog") {
+		await linkPostToTravel(title, folderPath);
+		// Refetch to get updated travel info
+		dbMetadata = await getBlogPostByTitle(title, folderPath);
+	}
+
+	// Mark post as published when accessed
+	if (dbMetadata) {
+		await markPostAsPublished(title);
+	}
+} catch (error) {
+	console.error("Error fetching blog post metadata:", error);
+}
+
+// Use database dates if available, fallback to frontmatter
+const displayPubDate = dbMetadata?.startDate
+	? new Date(dbMetadata.startDate)
+	: pubDate;
+const displayUpdatedDate = dbMetadata?.updatedAt
+	? new Date(dbMetadata.updatedAt)
+	: updatedDate;
+const displayEndDate = dbMetadata?.endDate
+	? new Date(dbMetadata.endDate)
+	: null;
+
+console.log("Database metadata:", dbMetadata);
 ---
 
 <html lang="en">
 	<head>
 		<BaseHead title={title} description={description} />
 		<style>
+			body {
+				background: linear-gradient(to bottom, #fdf2f8, #ffffff);
+				min-height: 100vh;
+			}
 			main {
-				width: calc(100% - 2em);
+				width: 100%;
 				max-width: 100%;
 				margin: 0;
 			}
+			.hero-section {
+				background: linear-gradient(
+					135deg,
+					#fdf2f8 0%,
+					#ffffff 50%,
+					#fef7f0 100%
+				);
+				padding: 3rem 0 4rem 0;
+				position: relative;
+				overflow: hidden;
+			}
+			.hero-section::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					to bottom,
+					transparent,
+					rgba(255, 255, 255, 0.2)
+				);
+				pointer-events: none;
+			}
+			.hero-content {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 0 2rem;
+				position: relative;
+				z-index: 1;
+			}
 			.hero-image {
 				width: 100%;
+				max-width: 800px;
+				margin: 0 auto 2rem auto;
+				border-radius: 20px;
+				overflow: hidden;
+				box-shadow: 0 20px 40px rgba(244, 114, 182, 0.15);
+				transition:
+					transform 0.3s ease,
+					box-shadow 0.3s ease;
+			}
+			.hero-image:hover {
+				transform: translateY(-4px);
+				box-shadow: 0 25px 50px rgba(244, 114, 182, 0.2);
 			}
 			.hero-image img {
 				display: block;
+				width: 100%;
+				height: auto;
+				border-radius: 20px;
+			}
+			.blog-header {
+				text-align: center;
+				margin-bottom: 3rem;
+			}
+			.blog-meta {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				gap: 1rem;
+				margin-bottom: 1.5rem;
+				font-size: 0.9rem;
+				color: #f472b6;
+				flex-wrap: wrap;
+			}
+			.blog-meta .date {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.blog-meta .location {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+			.blog-meta .travel-info {
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+				font-style: italic;
+			}
+			.blog-meta .separator {
+				color: #f472b6;
+				opacity: 0.6;
+			}
+			.blog-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				justify-content: center;
+				margin: 1.5rem 0;
+			}
+			.tag {
+				background: linear-gradient(135deg, #f472b6, #ec4899);
+				color: white;
+				padding: 0.4rem 0.8rem;
+				border-radius: 20px;
+				font-size: 0.8rem;
+				font-weight: 500;
+				text-decoration: none;
+				transition: all 0.2s ease;
+			}
+			.tag:hover {
+				transform: translateY(-1px);
+				box-shadow: 0 4px 12px rgba(244, 114, 182, 0.3);
+			}
+			.blog-title {
+				font-size: 3rem;
+				font-weight: bold;
+				color: #f472b6;
+				margin: 0 0 1rem 0;
+				line-height: 1.2;
+				font-family:
+					system-ui,
+					-apple-system,
+					sans-serif;
+			}
+			.blog-description {
+				font-size: 1.2rem;
+				color: #6b7280;
+				max-width: 600px;
+				margin: 0 auto 2rem auto;
+				line-height: 1.6;
+			}
+			.blog-divider {
+				width: 60px;
+				height: 3px;
+				background: linear-gradient(to right, #f472b6, #ec4899);
+				border: none;
+				border-radius: 2px;
 				margin: 0 auto;
-				border-radius: 12px;
-				box-shadow: var(--box-shadow);
+			}
+			.content-wrapper {
+				background: linear-gradient(
+					135deg,
+					#fdf2f8 0%,
+					#ffffff 50%,
+					#fef7f0 100%
+				);
+				border-radius: 24px;
+				box-shadow: 0 4px 20px rgba(244, 114, 182, 0.05);
+				margin: 2rem auto;
+				max-width: 800px;
+				overflow: hidden;
+				position: relative;
+			}
+			.content-wrapper::before {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				background: linear-gradient(
+					to bottom,
+					transparent,
+					rgba(255, 255, 255, 0.1)
+				);
+				pointer-events: none;
 			}
 			.prose {
-				width: 720px;
-				max-width: calc(100% - 2em);
-				margin: auto;
-				padding: 1em;
-				color: rgb(var(--gray-dark));
+				max-width: none;
+				margin: 0;
+				padding: 3rem;
+				color: #374151;
+				line-height: 1.7;
+				font-size: 1.1rem;
+				position: relative;
+				z-index: 1;
 			}
-			.title {
-				margin-bottom: 1em;
-				padding: 1em 0;
-				text-align: center;
-				line-height: 1;
-			}
-			.title h1 {
-				margin: 0 0 0.5em 0;
-			}
-			.date {
-				margin-bottom: 0.5em;
-				color: rgb(var(--gray));
-			}
-			.last-updated-on {
+			.last-updated {
+				background: #fef7f0;
+				padding: 1rem 1.5rem;
+				border-radius: 12px;
+				border-left: 4px solid #f472b6;
+				margin: 2rem 0;
 				font-style: italic;
+				color: #6b7280;
+				font-size: 0.9rem;
+			}
+
+			@media (max-width: 768px) {
+				.hero-content {
+					padding: 0 1rem;
+				}
+				.blog-title {
+					font-size: 2.2rem;
+				}
+				.prose {
+					padding: 2rem 1.5rem;
+				}
+				.blog-meta {
+					font-size: 0.8rem;
+				}
 			}
 		</style>
 	</head>
@@ -58,28 +273,137 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 	<body>
 		<Header />
 		<main>
-			<article>
-				<div class="hero-image">
-					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
-				</div>
-				<div class="prose">
-					<div class="title">
-						<div class="date">
-							<FormattedDate date={pubDate} />
+			<div class="hero-section">
+				<div class="hero-content">
+					{
+						heroImage && (
+							<div class="hero-image">
+								<Image
+									width={1020}
+									height={510}
+									src={heroImage}
+									alt={title}
+								/>
+							</div>
+						)
+					}
+
+					<div class="blog-header">
+						<div class="blog-meta">
+							<div class="date">
+								<svg
+									width="16"
+									height="16"
+									fill="currentColor"
+									viewBox="0 0 24 24"
+								>
+									<path
+										d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM7 10h5v5H7z"
+									></path>
+								</svg>
+								{
+									displayEndDate ? (
+										<span>
+											<FormattedDate
+												date={displayPubDate}
+											/>{" "}
+											-{" "}
+											<FormattedDate
+												date={displayEndDate}
+											/>
+										</span>
+									) : (
+										<FormattedDate date={displayPubDate} />
+									)
+								}
+							</div>
 							{
-								updatedDate && (
-									<div class="last-updated-on">
-										Last updated on <FormattedDate date={updatedDate} />
-									</div>
+								dbMetadata?.location && (
+									<>
+										<span class="separator">•</span>
+										<div class="location">
+											<svg
+												width="16"
+												height="16"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+											</svg>
+											{dbMetadata.location}
+										</div>
+									</>
+								)
+							}
+							{
+								dbMetadata?.travelTitle && (
+									<>
+										<span class="separator">•</span>
+										<div class="travel-info">
+											<svg
+												width="16"
+												height="16"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M6.5,12C5.67,12 5,12.67 5,13.5C5,14.33 5.67,15 6.5,15C7.33,15 8,14.33 8,13.5C8,12.67 7.33,12 6.5,12M17.5,12C16.67,12 16,12.67 16,13.5C16,14.33 16.67,15 17.5,15C18.33,15 19,14.33 19,13.5C19,12.67 18.33,12 17.5,12M18.92,6.01C18.72,5.42 18.16,5 17.5,5H15L13.5,2H10.5L9,5H6.5C5.84,5 5.28,5.42 5.08,6.01L4,10V16C4,17.1 4.9,18 6,18V19C6,19.55 6.45,20 7,20H8C8.55,20 9,19.55 9,19V18H15V19C15,19.55 15.45,20 16,20H17C17.55,20 17,19.55 17,19V18C18.1,18 19,17.1 19,16V10L18.92,6.01Z" />
+											</svg>
+											Part of{" "}
+											{dbMetadata.travelTitle.replace(
+												/_/g,
+												" ",
+											)}
+										</div>
+									</>
+								)
+							}
+							{
+								displayUpdatedDate && (
+									<>
+										<span class="separator">•</span>
+										<div class="date">
+											<svg
+												width="16"
+												height="16"
+												fill="currentColor"
+												viewBox="0 0 24 24"
+											>
+												<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+											</svg>
+											Updated{" "}
+											<FormattedDate
+												date={displayUpdatedDate}
+											/>
+										</div>
+									</>
 								)
 							}
 						</div>
-						<h1>{title}</h1>
-						<hr />
+
+						<h1 class="blog-title">{title}</h1>
+
+						{
+							dbMetadata?.tags && dbMetadata.tags.length > 0 && (
+								<div class="blog-tags">
+									{dbMetadata.tags.map((tag) => (
+										<span class="tag">#{tag}</span>
+									))}
+								</div>
+							)
+						}
+
+						<p class="blog-description">{description}</p>
+
+						<hr class="blog-divider" />
 					</div>
-					<slot />
 				</div>
-			</article>
+			</div>
+
+			<div class="content-wrapper">
+				<article class="prose">
+					<slot />
+				</article>
+			</div>
 		</main>
 		<Footer />
 	</body>

@@ -16,7 +16,7 @@ import clefairyAtWorkImage from '../assets/clefairy_at_work.png';
 		<main>
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 				<!-- Page Header -->
-				<div class="text-center mb-12">
+				<div class="text-center mb-8">
 					<h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
 						Plans
 					</h1>
@@ -26,9 +26,22 @@ import clefairyAtWorkImage from '../assets/clefairy_at_work.png';
 				</div>
 
 				<!-- Work in Progress Section -->
-				<div class="text-center py-16">
+				<div class="text-center">
 					<div class="mb-8">
-						<img src={clefairyAtWorkImage.src} alt="Clefairy at work" class="h-88 mx-auto object-contain" />
+						<video 
+							width="480" 
+							height="192" 
+							autoplay 
+							loop 
+							muted 
+							playsinline
+							class="mx-auto mt-4 rounded-lg"
+						>
+							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.mp4" type="video/mp4">
+							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.webm" type="video/webm">
+							<!-- Fallback to GIF for older browsers -->
+							<img src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.gif" alt="Clefairy Pokemon" width="480" height="192" />
+						</video>
 					</div>
 					<h2 class="text-3xl font-bold text-gray-800 mb-4">Work in Progress</h2>
 					<p class="text-gray-600 text-lg max-w-md mx-auto">

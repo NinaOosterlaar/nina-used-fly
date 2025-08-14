@@ -7,7 +7,7 @@ import { SITE_TITLE } from "../consts";
 		<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 			<div class="flex justify-between h-16">
 				<div class="flex items-center">
-					<a href="#" class="flex-shrink-0 flex items-center">
+					<a href="/" class="flex-shrink-0 flex items-center">
 						<i
 							class="fas fa-plane-departure text-2xl text-pink-300 mr-2"
 						></i>
@@ -130,20 +130,33 @@ import { SITE_TITLE } from "../consts";
 
 <script>
 	// Mobile menu toggle functionality
-	document.addEventListener('DOMContentLoaded', function() {
+	function initializeMobileMenu() {
 		const mobileMenuButton = document.getElementById('mobile-menu-button');
 		const mobileMenu = document.getElementById('mobile-menu');
 		
 		if (mobileMenuButton && mobileMenu) {
-			mobileMenuButton.addEventListener('click', function() {
-				const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
-				
-				// Toggle menu visibility
-				mobileMenu.classList.toggle('hidden');
-				
-				// Update aria-expanded attribute
-				mobileMenuButton.setAttribute('aria-expanded', String(!isExpanded));
-			});
+			// Remove any existing event listeners to prevent duplicates
+			mobileMenuButton.replaceWith(mobileMenuButton.cloneNode(true));
+			const newButton = document.getElementById('mobile-menu-button');
+			
+			if (newButton) {
+				newButton.addEventListener('click', function() {
+					const isExpanded = newButton.getAttribute('aria-expanded') === 'true';
+					
+					// Toggle menu visibility
+					mobileMenu.classList.toggle('hidden');
+					
+					// Update aria-expanded attribute
+					newButton.setAttribute('aria-expanded', String(!isExpanded));
+				});
+			}
 		}
-	});
+	}
+
+	// Initialize immediately if DOM is ready, otherwise wait for it
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', initializeMobileMenu);
+	} else {
+		initializeMobileMenu();
+	}
 </script>
