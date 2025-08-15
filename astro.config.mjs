@@ -9,7 +9,6 @@ import netlify from '@astrojs/netlify';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://ninausedfly.com', // Change this to your custom domain
-  base: '/nina-used-fly',
   integrations: [mdx(), sitemap()],
 
   vite: {
