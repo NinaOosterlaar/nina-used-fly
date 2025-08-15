@@ -89,12 +89,6 @@ export const postTags = sqliteTable('post_tags', {
         .references(() => tag.id, { onDelete: 'cascade' }).notNull(),
 });
 
-export const email = sqliteTable('emails', {
-    id: integer('id').primaryKey(),
-    email: text('email').notNull().unique(),
-    created_at: text('created_at').notNull(),
-});
-
 // Exporting all tables for use in the database connection
 export const schema = {
     continent,
@@ -107,7 +101,6 @@ export const schema = {
     post,
     tag,
     postTags,
-    email,
 };
 
 
