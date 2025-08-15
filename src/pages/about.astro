@@ -3,7 +3,17 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE } from '../consts';
-import clefairyAtWorkImage from '../assets/clefairy_at_work.png';
+
+// Calculate age dynamically
+const birthDate = new Date('2001-07-12');
+const today = new Date();
+let age = today.getFullYear() - birthDate.getFullYear();
+const monthDifference = today.getMonth() - birthDate.getMonth();
+
+// Adjust age if birthday hasn't occurred this year yet
+if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+  age--;
+}
 ---
 
 <!DOCTYPE html>
@@ -16,40 +26,164 @@ import clefairyAtWorkImage from '../assets/clefairy_at_work.png';
 		<main>
 			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 				<!-- Page Header -->
-				<div class="text-center mb-8">
+				<div class="text-center mb-12">
 					<h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
-						About
+						About Me
 					</h1>
-					<p class="text-gray-600 max-w-2xl mx-auto">
-						Get to know me!
+					<p class="text-gray-600 max-w-2xl mx-auto mb-8">
+						Welcome, below you can see me, Nina.  This picture was taken in Ireland, hopefully a blog post about that trip will be online soon!
+						I am a {age} year old girl from The Netherlands. On this page, I’ll tell you a little about myself and explain why I started this travel diary.
+					</p>
+					
+					<!-- Profile Picture -->
+					<div class="mb-8">
+						<img 
+							src="about/me_picture.JPG"
+							alt="Nina's profile picture"
+							class="w-48 h-48 md:w-64 md:h-64 rounded-full mx-auto shadow-lg border-4 border-pink-200 object-cover"
+						/>
+					</div>
+					<div class="text-center mb-12">
+						<h3 class="text-lg font-semibold text-pink-400 mb-4 ">Why I started this blog</h3>
+					<p class="text-gray-600 max-w-2xl mx-auto mb-8">
+						As a child, I really liked writing, which is something I want to pick up again. As an adult, I really like travelling. So I thought, why not combine these two passions and start a travel diary? This way I can record my journeys, enabling me to relive them and share them with others.
+						<br />
+						I am currently a master's student Nanobiology and Computer Science, with a specialization in Bioinformatics, at the TU Delft.
+						In my studies, I mainly focus on data analysis and artificial intelligence, so building websites is not really my comfort zone. 
+						That’s why I thought it would be fun (and a bit of a challenge) to create my travel diary as a website that I am building myself.
+						So far I have learned a lot, and I hope to continue learning as I add more features and content.
+					</p>
+					<div class="text-center mb-12">
+						<h3 class="text-lg font-semibold text-pink-400 mb-4 ">More about me</h3>
+					<p class="text-gray-600 max-w-2xl mx-auto mb-8">
+						So now you know a bit more about why I started this project. Let me tell you more about me as a person. Currently, my two main hobbies are reading and gaming. 
+						I love to immerse myself into another world, whether it is through a book or a game. My favorite book genres are fantasy and science fiction, but I also try to expand my horizons by reading other genres, like non-fiction and literature. 
+						When it comes to gaming, I like to play a variety of games, from rpg games, like Baldur's Gate, to cozy games like The Sims and Stardew Valley. But my all time favorite game series is Pokémon.
+
 					</p>
 				</div>
 
-				<!-- Work in Progress Section -->
-				<div class="text-center">
-					<div class="mb-8">
-						<video 
-							width="480" 
-							height="192" 
-							autoplay 
-							loop 
-							muted 
-							playsinline
-							class="mx-auto mt-4 rounded-lg"
+				<div class="text-center mb-12">
+					<div class="relative max-w-lg mx-auto">
+						<!-- Carousel Container -->
+						<div class="relative overflow-hidden rounded-lg shadow-lg bg-gray-50">
+							<div id="carousel" class="flex transition-transform duration-300 ease-in-out">
+								<img 
+									src="about/Toby_me.JPG"
+									alt="Me with Toby"
+									class="w-full max-h-96 object-contain flex-shrink-0"
+								/>
+								<img 
+									src="about/me_sebas_eevee.jpg"
+									alt="Me with Sebastiaan and Eevee plushie"
+									class="w-full max-h-96 object-contain flex-shrink-0"
+								/>
+								<img 
+									src="about/pokemon_me.jpg"
+									alt="Me with Pokemon theme"
+									class="w-full max-h-96 object-contain flex-shrink-0"
+								/>
+							</div>
+						</div>
+						
+						<!-- Navigation Arrows -->
+						<button 
+							id="prevBtn"
+							class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-pink-400 hover:bg-pink-500 text-white rounded-full p-2 shadow-lg transition-colors duration-200"
+							aria-label="Previous image"
 						>
-							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.mp4" type="video/mp4">
-							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.webm" type="video/webm">
-							<!-- Fallback to GIF for older browsers -->
-							<img src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.gif" alt="Clefairy Pokemon" width="480" height="192" />
-						</video>
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+							</svg>
+						</button>
+						
+						<button 
+							id="nextBtn"
+							class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-pink-400 hover:bg-pink-500 text-white rounded-full p-2 shadow-lg transition-colors duration-200"
+							aria-label="Next image"
+						>
+							<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+								<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+							</svg>
+						</button>
+
+						<!-- Dots Indicator -->
+						<div class="flex justify-center mt-4 space-x-2">
+							<button class="dot w-3 h-3 rounded-full bg-pink-400 transition-opacity duration-200" data-slide="0"></button>
+							<button class="dot w-3 h-3 rounded-full bg-gray-300 hover:bg-pink-300 transition-colors duration-200" data-slide="1"></button>
+							<button class="dot w-3 h-3 rounded-full bg-gray-300 hover:bg-pink-300 transition-colors duration-200" data-slide="2"></button>
+						</div>
 					</div>
-					<h2 class="text-3xl font-bold text-gray-800 mb-4">Work in Progress</h2>
-					<p class="text-gray-600 text-lg max-w-md mx-auto">
-						I'm currently still writing my story and in general working on this website. 
+				</div> 	
+
+				<div class="text-center mb-12">
+					<p class="text-gray-600 max-w-2xl mx-auto mb-8">
+						My passion for Pokémon deserves its own paragraph, so here I go. As a child, I always loved the Pokémon games and anime. I have played Pokémon sapphire countless of times, and have enjoyed almost all other Pokémon games as well. 
+						Additionally, my boyfriend and I try to collect Pokémon cards, as long as they are not too overpriced due to scalpers... 
+						We also like to play Pokémon Go together, which is a great way to explore new places (add me with friend code 9079 6805 2888). We also try to go to Pokémon events, so you may see some blog posts about these on this website as well!
+						I have also crocheted some Pokémon plushies (and other plushies), which you can see on my <a href="https://instagram.com/ninappelsap" target="_blank" rel="noopener noreferrer" class="text-pink-500 hover:text-pink-600 underline">Instagram account</a>. 
+						My love for Pokémon is the reason that you might see some Pokémon pictures and references on this website, for example the name of this website, Nina Used Fly, which is a reference to the move Fly that many Pokémon can learn to travel quickly. 
+					</br> (I hope The Pokémon Company will never sue me for this)
+
 					</p>
 				</div>
+
+
 			</div>
 		</main>
 		<Footer />
+		
+		<script>
+			// Carousel functionality
+			const carousel = document.getElementById('carousel');
+			const prevBtn = document.getElementById('prevBtn');
+			const nextBtn = document.getElementById('nextBtn');
+			const dots = document.querySelectorAll('.dot');
+			
+			let currentSlide = 0;
+			const totalSlides = 3;
+			
+			function updateCarousel() {
+				const translateX = -currentSlide * 100;
+				carousel.style.transform = `translateX(${translateX}%)`;
+				
+				// Update dots
+				dots.forEach((dot, index) => {
+					if (index === currentSlide) {
+						dot.classList.remove('bg-gray-300');
+						dot.classList.add('bg-pink-400');
+					} else {
+						dot.classList.remove('bg-pink-400');
+						dot.classList.add('bg-gray-300');
+					}
+				});
+			}
+			
+			function nextSlide() {
+				currentSlide = (currentSlide + 1) % totalSlides;
+				updateCarousel();
+			}
+			
+			function prevSlide() {
+				currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+				updateCarousel();
+			}
+			
+			function goToSlide(slideIndex) {
+				currentSlide = slideIndex;
+				updateCarousel();
+			}
+			
+			// Event listeners
+			nextBtn.addEventListener('click', nextSlide);
+			prevBtn.addEventListener('click', prevSlide);
+			
+			dots.forEach((dot, index) => {
+				dot.addEventListener('click', () => goToSlide(index));
+			});
+			
+			// Optional: Auto-play (uncomment if you want automatic sliding)
+			// setInterval(nextSlide, 5000);
+		</script>
 	</body>
 </html>

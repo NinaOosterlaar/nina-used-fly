@@ -2,6 +2,7 @@
 const today = new Date();
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { url } from "../utils/url";
+import cartoonArt from "../assets/cartoon-art.png";
 ---
 
 <footer class="bg-white">
@@ -88,25 +89,32 @@ import { url } from "../utils/url";
 				</div>
 			</div>
 
-			<div>
-				<h3
-					class="title-font text-sm font-semibold text-gray-500 tracking-wider uppercase"
-				>
-					Contact
-				</h3>
-				<ul class="mt-4 space-y-2">
-					<li class="flex items-start">
-						<i class="fas fa-envelope text-pink-300 mt-1 mr-2"></i>
-						<span class="text-gray-500">ninaoosterlaar@gmail.com</span>
-					</li>
-					<li class="flex items-start">
-						<i class="fas fa-map-marker-alt text-pink-300 mt-1 mr-2"
-						></i>
-						<span class="text-gray-500"
-							>Based in Delft, The Netherlands</span
-						>
-					</li>
-				</ul>
+			<div class="flex items-start gap-4">
+				<div class="flex-1">
+					<h3
+						class="title-font text-sm font-semibold text-gray-500 tracking-wider uppercase"
+					>
+						Contact
+					</h3>
+					<ul class="mt-4 space-y-2">
+						<li class="flex items-start">
+							<i class="fas fa-envelope text-pink-300 mt-1 mr-2"></i>
+							<span class="text-gray-500">ninaoosterlaar@gmail.com</span>
+						</li>
+						<li class="flex items-start">
+							<i class="fas fa-map-marker-alt text-pink-300 mt-1 mr-2"
+							></i>
+							<span class="text-gray-500"
+								>Based in Delft, The Netherlands</span
+							>
+						</li>
+					</ul>
+				</div>
+				<img
+					src={cartoonArt.src}
+					alt="Nina's cartoon avatar"
+					class="w-30 h-30 rounded-full shadow-lg border-3 border-pink-200 flex-shrink-0"
+				/>
 			</div>
 		</div>
 
