@@ -2,14 +2,17 @@
 export const countryConfig: Record<string, {
   description: string;
   flag: string;
+  heroImage: string;
 }> = {
   'France': {
     description: 'France, the country of people that refuse to speak English and Disneyland. Is that rude to say? I have not thoroughly explored France yet, but I have visited Paris, which is one of the most beautiful cities I have been to. I aspire to explore more of France in the future, especially the smaller towns and countryside.',
-    flag: '🇫🇷'
+    flag: '🇫🇷',
+    heroImage: '/Country_covers/france.jpg'
   },
   'Belgium': {
     description: 'Ah, our neighbours. Belgium has some beautiful cities, maybe even more beautiful than the Dutch cities? I feel like a traitor. Maybe we can colonize it again? I have only been to the flemish part of Belgium, but I would love to explore the Walloon region as well.',
-    flag: '🇧🇪'
+    flag: '🇧🇪',
+    heroImage: '/Country_covers/belgium.jpg'
     },
 
 };
@@ -41,4 +44,9 @@ export function getCountryDescription(countryName: string): string {
 // Helper function to get country flag
 export function getCountryFlag(countryName: string): string {
   return countryConfig[countryName]?.flag || '🌍';
+}
+
+// Helper function to get country hero image
+export function getCountryHeroImage(countryName: string, fallbackImage?: string): string {
+  return countryConfig[countryName]?.heroImage || fallbackImage || '/assets/fidough.png';
 }

@@ -1,6 +1,6 @@
 import { db } from '../db/index';
 import { post, postTags, tag, location, travel, country, continent } from '../db/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, desc, sql } from 'drizzle-orm';
 import { getCollection, type CollectionEntry } from 'astro:content';
 
 export interface BlogPostMetadata {
@@ -177,7 +177,7 @@ export async function linkPostToTravel(postTitle: string, folderPath: string): P
 // Function to get database posts enriched with markdown frontmatter
 export async function getEnrichedPostsForCountry(countryName: string): Promise<EnrichedBlogPost[]> {
   try {
-    // Get all posts from the database for the specified country with proper joins
+    // Get all posts from the database for the specified country with proper joins, ordered by start date
     const dbPosts = await db
       .select({
         postId: post.id,
@@ -193,6 +193,7 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .where(eq(country.name, countryName))
+      .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
       .all();
 
     console.log(`Found ${dbPosts.length} posts for ${countryName}:`, dbPosts);
