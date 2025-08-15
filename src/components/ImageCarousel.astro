@@ -21,7 +21,7 @@ const uniqueId = `${id}-${Math.random().toString(36).substr(2, 9)}`;
         <img 
           src={image.src}
           alt={image.alt}
-          style={`width: 100%; max-height: ${maxHeight}; object-contain; flex-shrink: 0;`}
+          style={`width: 100%; max-height: ${maxHeight}; object-fit: contain; flex-shrink: 0;`}
         />
       ))}
     </div>
