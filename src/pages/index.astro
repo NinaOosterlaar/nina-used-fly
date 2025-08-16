@@ -4,6 +4,7 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from 'astro:content';
+import { getNumberOfEnrichedPosts } from '../utils/blog-db';
 import { url } from "../utils/url";
 import { resolveImageUrl } from "../utils/image";
 
@@ -11,9 +12,7 @@ import { resolveImageUrl } from "../utils/image";
 const allPosts = await getCollection('blog');
 
 // Get the 3 most recent posts sorted by publication date
-const recentPosts = allPosts
-  .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
-  .slice(0, 3);
+const recentPosts = await getNumberOfEnrichedPosts(3);
 
 // Prepare all post URLs for client-side random selection
 const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`));
@@ -120,7 +119,7 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 				</div>
 			</div> -->
 
-			<style>
+			<!-- <style>
 				@media (min-width: 1024px) {
 					#draggable-map {
 						height: 80vh !important;
@@ -235,7 +234,7 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 				window.addEventListener("DOMContentLoaded", () => {
 					updateMapBehavior();
 				});
-			</script>
+			</script> -->
 
 			<!-- Recent Posts -->
 			<div class="relative bg-gradient-to-b from-pink-50 to-white py-20">
@@ -254,14 +253,14 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 					<div class="grid grid-cols-1 md:grid-cols-3 gap-8">
 						{recentPosts.map((post) => (
 							<a 
-								href={url(`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`)}
+								href={url(post.markdownData?.url || `/blog/post-${post.id}`)}
 								class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
 							>
 								<div class="h-48 overflow-hidden">
-									{post.data.heroImage ? (
+									{post.markdownData?.heroImage ? (
 										<img
-											src={resolveImageUrl(post.data.heroImage)}
-											alt={post.data.title}
+											src={resolveImageUrl(post.markdownData.heroImage)}
+											alt={post.title}
 											class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
 										/>
 									) : (
@@ -275,16 +274,27 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 								</div>
 								<div class="p-6">
 									<div class="flex items-center text-sm text-pink-400 mb-2">
-										<i class="fas fa-calendar mr-1"></i>
-										<span>{new Date(post.data.pubDate).toLocaleDateString('en-GB')}</span>
+										<i class="fas fa-map-marker-alt mr-1"></i>
+										<span>{post.location}</span>
+										{post.startDate && (
+											<>
+												<span class="mx-2">•</span>
+												<span>
+													{new Date(post.startDate).toLocaleDateString('en-GB')}
+													{post.endDate && (
+														<> - {new Date(post.endDate).toLocaleDateString('en-GB')}</>
+													)}
+												</span>
+											</>
+										)}
 									</div>
 									<h3 class="title-font text-xl font-semibold text-gray-800 mb-3">
-										{post.data.title}
+										{post.title.replace(/_/g, ' ')}
 									</h3>
-									<p class="text-gray-500 mb-4">
-										{post.data.description}
+									<p class="text-gray-600 mb-4">
+										{post.markdownData?.description || 'Read about my experiences and discoveries in this beautiful location in Belgium.'}
 									</p>
-									<div class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium">
+									<div class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200">
 										Read more
 										<i class="fas fa-arrow-right ml-2"></i>
 									</div>

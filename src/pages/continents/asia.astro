@@ -29,7 +29,7 @@ const asianCountriesWithPosts = await db
   .all();
 
 // Debug: log the results
-console.log('Asian countries with posts:', asianCountriesWithPosts);
+// console.log('Asian countries with posts:', asianCountriesWithPosts);
 
 // Default image for all countries
 const defaultImage = fidoughImage.src;
@@ -59,7 +59,7 @@ const defaultImage = fidoughImage.src;
 				{asianCountriesWithPosts.length > 0 ? (
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 						{asianCountriesWithPosts.map((countryData) => (
-							<div onclick={`location.href='${url(`/countries/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}'`} class="country-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
+							<div onclick={`location.href='${url(`/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}'`} class="country-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
 								<div class="h-48 overflow-hidden">
 									<img
 										src={getCountryHeroImage(countryData.countryName, defaultImage)}
@@ -80,7 +80,7 @@ const defaultImage = fidoughImage.src;
 										{getCountryPreview(countryData.countryName)}
 									</p>
 									<a
-										href={url(`/countries/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}
+										href={url(`/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}
 										class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200"
 									>
 										Explore {countryData.countryName}
