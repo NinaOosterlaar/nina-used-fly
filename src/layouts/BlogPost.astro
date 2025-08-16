@@ -20,8 +20,8 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 const currentPath = Astro.url.pathname;
 const folderPath = currentPath.split("/").slice(-2, -1)[0]; // Get the folder name
 
-console.log(`Processing blog post: ${title}`);
-console.log(`Folder path: ${folderPath}`);
+// console.log(`Processing blog post: ${title}`);
+// console.log(`Folder path: ${folderPath}`);
 
 // Fetch metadata from database
 let dbMetadata: BlogPostMetadata | null = null;
@@ -54,7 +54,7 @@ const displayEndDate = dbMetadata?.endDate
 	? new Date(dbMetadata.endDate)
 	: null;
 
-console.log("Database metadata:", dbMetadata);
+// console.log("Database metadata:", dbMetadata);
 ---
 
 <html lang="en">
@@ -105,6 +105,7 @@ console.log("Database metadata:", dbMetadata);
 			.hero-image {
 				width: 100%;
 				max-width: 800px;
+				max-height: 400px;
 				margin: 0 auto 2rem auto;
 				border-radius: 20px;
 				overflow: hidden;
@@ -120,8 +121,10 @@ console.log("Database metadata:", dbMetadata);
 			.hero-image img {
 				display: block;
 				width: 100%;
-				height: auto;
+				height: 100%;
+				max-height: 400px;
 				border-radius: 20px;
+				object-fit: cover;
 			}
 			.blog-header {
 				text-align: center;

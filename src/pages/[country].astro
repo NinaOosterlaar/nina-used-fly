@@ -1,21 +1,36 @@
 ---
-import BaseHead from '../../components/BaseHead.astro';
-import Header from '../../components/Header.astro';
-import Footer from '../../components/Footer.astro';
-import { SITE_TITLE } from '../../consts';
-import { getCountryDescription, getCountryFlag } from '../../config/countries';
-import { getEnrichedPostsForCountry } from '../../utils/blog-db';
-import { url } from '../../utils/url';
-import { resolveImageUrl } from '../../utils/image';
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+import { getCountryDescription, getCountryFlag, countryConfig } from '../config/countries';
+import { getEnrichedPostsForCountry } from '../utils/blog-db';
+import { url } from '../utils/url';
+import { resolveImageUrl } from '../utils/image';
 
-// Get all enriched posts for Belgium (with markdown frontmatter)
-const belgiumPosts = await getEnrichedPostsForCountry('Belgium');
+export async function getStaticPaths() {
+	// Get all countries from the config
+	const countries = Object.keys(countryConfig);
+	
+	return countries.map((countryName) => ({
+		params: { country: countryName.toLowerCase() },
+		props: { countryName },
+	}));
+}
+
+const { country } = Astro.params;
+const { countryName } = Astro.props;
+
+// Get all enriched posts for this country (with markdown frontmatter)
+const countryPosts = await getEnrichedPostsForCountry(countryName);
+
+// console.log(`Country posts for ${countryName}:`, countryPosts);
 ---
 
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<BaseHead title={`Belgium - ${SITE_TITLE}`} description="My travels and adventures in Belgium" />
+		<BaseHead title={`${countryName} - ${SITE_TITLE}`} description={`My travels and adventures in ${countryName}`} />
 	</head>
 	<body>
 		<Header />
@@ -24,17 +39,17 @@ const belgiumPosts = await getEnrichedPostsForCountry('Belgium');
 				<!-- Page Header -->
 				<div class="text-center mb-12">
 					<h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
-						{getCountryFlag('Belgium')} Belgium
+						{getCountryFlag(countryName)} {countryName}
 					</h1>
 					<p class="text-gray-600 max-w-4xl mx-auto">
-						{getCountryDescription('Belgium')}
+						{getCountryDescription(countryName)}
 					</p>
 				</div>
 
 				<!-- Posts Grid -->
-				{belgiumPosts.length > 0 ? (
+				{countryPosts.length > 0 ? (
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-						{belgiumPosts.map((postData) => (
+						{countryPosts.map((postData) => (
 							<a 
 								href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
 								class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
@@ -75,7 +90,7 @@ const belgiumPosts = await getEnrichedPostsForCountry('Belgium');
 										{postData.title.replace(/_/g, ' ')}
 									</h3>
 									<p class="text-gray-600 mb-4">
-										{postData.markdownData?.description || 'Read about my experiences and discoveries in this beautiful location in Belgium.'}
+										{postData.markdownData?.description || `Read about my experiences and discoveries in this beautiful location in ${countryName}.`}
 									</p>
 									<div class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200">
 										Read more
@@ -90,9 +105,9 @@ const belgiumPosts = await getEnrichedPostsForCountry('Belgium');
 						<div class="text-gray-400 mb-4">
 							<i class="fas fa-camera text-6xl"></i>
 						</div>
-						<h3 class="text-xl font-semibold text-gray-600 mb-2">No Belgium Adventures Yet</h3>
+						<h3 class="text-xl font-semibold text-gray-600 mb-2">No {countryName} Adventures Yet</h3>
 						<p class="text-gray-500">
-							I haven't shared any stories from Belgium yet, but stay tuned for upcoming adventures!
+							I haven't shared any stories from {countryName} yet, but stay tuned for upcoming adventures!
 						</p>
 					</div>
 				)}
