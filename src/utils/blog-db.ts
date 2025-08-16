@@ -196,8 +196,6 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
       .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
       .all();
 
-    console.log(`Found ${dbPosts.length} posts for ${countryName}:`, dbPosts);
-
     // Get all markdown posts
     const markdownPosts = await getCollection('blog');
     
@@ -256,6 +254,74 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
     return enrichedPosts;
   } catch (error) {
     console.error('Error fetching enriched blog posts:', error);
+    return [];
+  }
+}
+
+export async function getNumberOfEnrichedPosts(number: number): Promise<EnrichedBlogPost[]> {
+  try {
+    // Get the latest 'number' of posts from the database
+    const dbPosts = await db
+      .select({
+        postId: post.id,
+        postTitle: post.title,
+        postStartDate: post.startDate,
+        postEndDate: post.endDate,
+        postCreatedAt: post.createdAt,
+        postIsPublished: post.isPublished,
+        locationName: location.name,
+      })
+      .from(post)
+      .innerJoin(location, eq(post.locationId, location.id))
+      .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
+      .limit(number)
+      .all();
+
+    // Get all markdown posts
+    const markdownPosts = await getCollection('blog');
+
+    // Enrich posts with markdown data
+    const enrichedPosts: EnrichedBlogPost[] = dbPosts.map(dbPost => {
+      const matchingMarkdown = markdownPosts.find(mdPost => {
+        const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
+        const dbTitleNormalized = dbPost.postTitle
+          .toLowerCase()
+          .replace(/_/g, '-')
+          .replace(/\s+/g, '-')
+          .normalize('NFD') // Decompose accented characters
+          .replace(/[\u0300-\u036f]/g, ''); // Remove diacritical marks
+        return slug === dbTitleNormalized;
+      });
+
+      const enrichedPost: EnrichedBlogPost = {
+        id: dbPost.postId,
+        title: dbPost.postTitle,
+        startDate: dbPost.postStartDate,
+        endDate: dbPost.postEndDate,
+        createdAt: dbPost.postCreatedAt,
+        updatedAt: null,
+        isPublished: Boolean(dbPost.postIsPublished),
+        tags: [],
+        location: dbPost.locationName,
+        travelTitle: null,
+      };
+
+      if (matchingMarkdown) {
+        enrichedPost.markdownData = {
+          description: matchingMarkdown.data.description,
+          heroImage: matchingMarkdown.data.heroImage,
+          pubDate: matchingMarkdown.data.pubDate,
+          slug: matchingMarkdown.id,
+          url: `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
+        };
+      }
+
+      return enrichedPost;
+    });
+
+    return enrichedPosts;
+  } catch (error) {
+    console.error('Error fetching number of enriched posts:', error);
     return [];
   }
 }
