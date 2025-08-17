@@ -6,7 +6,6 @@ import Footer from "../components/Footer.astro";
 import FormattedDate from "../components/FormattedDate.astro";
 import {
 	getBlogPostByTitle,
-	markPostAsPublished,
 	linkPostToTravel,
 	type BlogPostMetadata,
 } from "../utils/blog-db";
@@ -33,11 +32,6 @@ try {
 		await linkPostToTravel(title, folderPath);
 		// Refetch to get updated travel info
 		dbMetadata = await getBlogPostByTitle(title, folderPath);
-	}
-
-	// Mark post as published when accessed
-	if (dbMetadata) {
-		await markPostAsPublished(title);
 	}
 } catch (error) {
 	console.error("Error fetching blog post metadata:", error);
