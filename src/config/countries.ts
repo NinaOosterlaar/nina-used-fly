@@ -13,7 +13,12 @@ export const countryConfig: Record<string, {
     description: 'Ah, our neighbours. Belgium has some beautiful cities, maybe even more beautiful than the Dutch cities? I feel like a traitor. Maybe we can colonize it again? I have only been to the flemish part of Belgium, but I would love to explore the Walloon region as well.',
     flag: '🇧🇪',
     heroImage: '/Country_covers/belgium.jpg'
-    },
+  },
+  'Netherlands': {
+    description: 'My home country, the Netherlands. I have lived here my whole life. I was born in the east of the Netherlands, lived in Zwolle for a while. Now I am studying in Delft. ',
+    flag: '🇳🇱',
+    heroImage: '/Country_covers/netherlands.jpg'
+  }
 
 };
 

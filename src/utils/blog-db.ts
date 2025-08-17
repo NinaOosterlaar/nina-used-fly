@@ -28,7 +28,7 @@ export interface EnrichedBlogPost extends BlogPostMetadata {
 
 // Convert blog post title to database format
 function titleToDbFormat(title: string): string {
-  return title.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '');
+  return title.replace(/\s+/g, '_').replace(/[^\p{L}\p{N}_]/gu, '');
 }
 
 // Convert folder path to travel title
@@ -45,7 +45,7 @@ function folderToTravelTitle(path: string): string {
 export async function getBlogPostByTitle(title: string, folderPath?: string): Promise<BlogPostMetadata | null> {
   try {
     const dbTitle = titleToDbFormat(title);
-    console.log(`Looking for post with title: ${dbTitle}`);
+    // console.log(`Looking for post with title: ${dbTitle}`);
     
     // Get the post with its location and travel info
     const postResult = await db
@@ -66,12 +66,12 @@ export async function getBlogPostByTitle(title: string, folderPath?: string): Pr
       .limit(1);
 
     if (postResult.length === 0) {
-      console.log(`No post found with title: ${dbTitle}`);
+      // console.log(`No post found with title: ${dbTitle}`);
       return null;
     }
 
     const postData = postResult[0];
-    console.log(`Found post:`, postData);
+    // console.log(`Found post:`, postData);
 
     // Get travel information if travelId exists
     let travelTitle: string | null = null;
@@ -96,7 +96,7 @@ export async function getBlogPostByTitle(title: string, folderPath?: string): Pr
       .innerJoin(tag, eq(postTags.tagId, tag.id))
       .where(eq(postTags.postId, postData.id));
 
-    console.log(`Found tags:`, tagsResult);
+    // console.log(`Found tags:`, tagsResult);
 
     return {
       id: postData.id,
@@ -128,7 +128,7 @@ export async function markPostAsPublished(title: string): Promise<boolean> {
       })
       .where(eq(post.title, dbTitle));
 
-    console.log(`Marked post ${dbTitle} as published`);
+    // console.log(`Marked post ${dbTitle} as published`);
     return true;
   } catch (error) {
     console.error('Error marking post as published:', error);
@@ -141,7 +141,7 @@ export async function linkPostToTravel(postTitle: string, folderPath: string): P
     const dbPostTitle = titleToDbFormat(postTitle);
     const travelTitle = folderToTravelTitle(folderPath);
     
-    console.log(`Trying to link post ${dbPostTitle} to travel ${travelTitle}`);
+    // console.log(`Trying to link post ${dbPostTitle} to travel ${travelTitle}`);
     
     // Find the travel by title
     const travelResult = await db
@@ -151,7 +151,7 @@ export async function linkPostToTravel(postTitle: string, folderPath: string): P
       .limit(1);
     
     if (travelResult.length === 0) {
-      console.log(`Travel not found: ${travelTitle}`);
+      // console.log(`Travel not found: ${travelTitle}`);
       return false;
     }
     
@@ -166,7 +166,7 @@ export async function linkPostToTravel(postTitle: string, folderPath: string): P
       })
       .where(eq(post.title, dbPostTitle));
     
-    console.log(`Successfully linked post ${dbPostTitle} to travel ${travelTitle}`);
+    // console.log(`Successfully linked post ${dbPostTitle} to travel ${travelTitle}`);
     return true;
   } catch (error) {
     console.error('Error linking post to travel:', error);
@@ -214,16 +214,14 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
         .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
         .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
       
-      console.log(`Looking for markdown file matching: ${dbTitleFormatted}`);
-      
       // Find matching markdown post
       const matchingMarkdown = markdownPosts.find(mdPost => {
         const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
-        console.log(`  Checking against slug: ${slug}`);
+        // console.log(`Comparing slug: ${slug} with dbTitleFormatted: ${dbTitleFormatted}`);
         return slug === dbTitleFormatted;
       });
       
-      console.log(`Found matching markdown:`, matchingMarkdown ? 'Yes' : 'No');
+      // console.log(`Found matching markdown:`, matchingMarkdown ? 'Yes' : 'No');
       
       const enrichedPost: EnrichedBlogPost = {
         id: dbPost.postId,
