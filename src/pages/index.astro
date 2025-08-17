@@ -2,6 +2,7 @@
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
+import TravelMap from "../components/TravelMap.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from 'astro:content';
 import { getNumberOfEnrichedPosts } from '../utils/blog-db';
@@ -60,181 +61,7 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 			</div>
 
 			<!-- Travel Map Section -->
-			<!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-				<div class="text-center mb-12">
-					<h2
-						class="title-font text-3xl font-semibold text-pink-400 mb-2"
-					>
-						My Journey So Far
-					</h2>
-					<p class="text-gray-500 max-w-2xl mx-auto">
-						Click on the markers to see where I've been
-					</p>
-				</div>
-
-					<div
-						class="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-pink-100"
-						style="height: 500px;"
-					>
-						<div class="absolute inset-0 bg-gradient-to-br from-pink-50/30 to-blue-50/30"></div>
-						<img
-							src="/src/assets/world.svg"
-							alt="World Map"
-							class="w-full h-full object-cover opacity-60"
-						/>
-
-					<div
-						class="map-marker"
-						style="top: 30%; left: 75%;"
-						data-location="New York"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 40%; left: 50%;"
-						data-location="Paris"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 60%; left: 70%;"
-						data-location="Bali"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 35%; left: 85%;"
-						data-location="Tokyo"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 55%; left: 60%;"
-						data-location="Cairo"
-					></div>
-					<div
-						class="map-marker"
-						style="top: 25%; left: 55%;"
-						data-location="London"
-					></div>
-
-						<div class="map-tooltip"></div>
-					</div>
-				</div>
-			</div> -->
-
-			<!-- <style>
-				@media (min-width: 1024px) {
-					#draggable-map {
-						height: 80vh !important;
-						min-height: 500px;
-						max-height: 900px;
-					}
-				}
-				.map-marker {
-					position: absolute;
-					width: 22px;
-					height: 22px;
-					background: #f472b6;
-					border: 2px solid #fff;
-					border-radius: 50%;
-					box-shadow: 0 2px 8px rgba(244, 114, 182, 0.2);
-					cursor: pointer;
-					transition: transform 0.15s, box-shadow 0.15s;
-					transform: translate(-50%, -50%);
-					z-index: 10;
-				}
-				.map-marker.active,
-				.map-marker:hover {
-					transform: translate(-50%, -50%) scale(1.2);
-					box-shadow: 0 4px 16px rgba(244, 114, 182, 0.4);
-				}
-				.map-tooltip {
-					position: absolute;
-					pointer-events: none;
-					background: #fff;
-					color: #f472b6;
-					padding: 6px 14px;
-					border-radius: 8px;
-					box-shadow: 0 2px 8px rgba(244, 114, 182, 0.15);
-					font-size: 1rem;
-					font-weight: 600;
-					opacity: 0;
-					transition: opacity 0.2s;
-					z-index: 20;
-					white-space: nowrap;
-				}
-			</style>
-
-			<script is:inline>
-				const map = document.getElementById("draggable-map");
-				let isDragging = false;
-				let startX, startY, scrollLeft, scrollTop;
-
-				function isLargeScreen() {
-					return window.innerWidth >= 1024;
-				}
-
-				function enableDrag() {
-					map.style.cursor = "grab";
-					map.addEventListener("mousedown", dragStart);
-					map.addEventListener("mouseleave", dragEnd);
-					map.addEventListener("mouseup", dragEnd);
-					map.addEventListener("mousemove", dragMove);
-					map.addEventListener("touchstart", dragStart, { passive: false });
-					map.addEventListener("touchend", dragEnd);
-					map.addEventListener("touchmove", dragMove, { passive: false });
-				}
-
-				function disableDrag() {
-					map.style.cursor = "default";
-					map.removeEventListener("mousedown", dragStart);
-					map.removeEventListener("mouseleave", dragEnd);
-					map.removeEventListener("mouseup", dragEnd);
-					map.removeEventListener("mousemove", dragMove);
-					map.removeEventListener("touchstart", dragStart);
-					map.removeEventListener("touchend", dragEnd);
-					map.removeEventListener("touchmove", dragMove);
-				}
-
-				function dragStart(e) {
-					if (isLargeScreen()) return;
-					isDragging = true;
-					map.style.cursor = "grabbing";
-					const evt = e.touches ? e.touches[0] : e;
-					startX = evt.pageX - map.offsetLeft;
-					startY = evt.pageY - map.offsetTop;
-					scrollLeft = map.scrollLeft;
-					scrollTop = map.scrollTop;
-					e.preventDefault();
-				}
-
-				function dragEnd() {
-					isDragging = false;
-					map.style.cursor = "grab";
-				}
-
-				function dragMove(e) {
-					if (!isDragging || isLargeScreen()) return;
-					const evt = e.touches ? e.touches[0] : e;
-					const x = evt.pageX - map.offsetLeft;
-					const y = evt.pageY - map.offsetTop;
-					map.scrollLeft = scrollLeft - (x - startX);
-					map.scrollTop = scrollTop - (y - startY);
-					e.preventDefault();
-				}
-
-				function updateMapBehavior() {
-					if (isLargeScreen()) {
-						disableDrag();
-						map.scrollLeft = 0;
-						map.scrollTop = 0;
-					} else {
-						enableDrag();
-					}
-				}
-
-				window.addEventListener("resize", updateMapBehavior);
-				window.addEventListener("DOMContentLoaded", () => {
-					updateMapBehavior();
-				});
-			</script> -->
+			<TravelMap />
 
 			<!-- Recent Posts -->
 			<div class="relative bg-gradient-to-b from-pink-50 to-white py-20">
@@ -391,8 +218,9 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 			window.addEventListener('scroll', () => {
 				const scrolled = window.pageYOffset;
 				const hero = document.querySelector('.bg-gradient-to-br');
-				if (hero) {
-					hero.style.transform = `translateY(${scrolled * 0.5}px)`;
+				if (hero && scrolled < window.innerHeight) {
+					// Only apply parallax when hero is visible and limit the effect
+					hero.style.transform = `translateY(${scrolled * 0.2}px)`;
 				}
 			});
 

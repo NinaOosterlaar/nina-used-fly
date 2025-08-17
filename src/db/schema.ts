@@ -18,6 +18,8 @@ export const location = sqliteTable('locations', {
     name: text('name').notNull(),
     countryId: integer('country_id')
         .references(() => country.id, { onDelete: 'cascade' }),
+    latitude: text('latitude'),
+    longitude: text('longitude'),
 });
 
 export const plans = sqliteTable('plans', {

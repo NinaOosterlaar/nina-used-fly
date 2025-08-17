@@ -1,0 +1,245 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { SITE_TITLE } from "../consts";
+import { getAllBlogPostsWithTags, searchPosts, filterPosts } from '../utils/search';
+import { url } from "../utils/url";
+
+// Get search parameters from URL
+const searchQuery = Astro.url.searchParams.get('q') || '';
+const countryFilter = Astro.url.searchParams.get('country') || '';
+const continentFilter = Astro.url.searchParams.get('continent') || '';
+const tagsFilter = Astro.url.searchParams.get('tags')?.split(',').filter(Boolean) || [];
+
+// Get all posts
+const allPosts = await getAllBlogPostsWithTags();
+
+// Apply search and filters
+let filteredPosts = allPosts;
+if (searchQuery) {
+  filteredPosts = searchPosts(filteredPosts, searchQuery);
+}
+
+if (countryFilter || continentFilter || tagsFilter.length > 0) {
+  filteredPosts = filterPosts(filteredPosts, {
+    country: countryFilter || undefined,
+    continent: continentFilter || undefined,
+    tags: tagsFilter.length > 0 ? tagsFilter : undefined,
+  });
+}
+
+// Get unique filter options from all posts
+const countries = [...new Set(allPosts.map(post => post.countryName))].sort();
+const continents = [...new Set(allPosts.map(post => post.continentName))].sort();
+const allTags = [...new Set(allPosts.flatMap(post => post.tags))].sort();
+
+// Create page title
+const searchTerms = [
+  searchQuery,
+  countryFilter,
+  continentFilter,
+  ...tagsFilter
+].filter(Boolean);
+
+const pageTitle = searchTerms.length > 0 
+  ? `Search Results for "${searchTerms.join(', ')}"` 
+  : 'Search Travel Posts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead 
+			title={`${pageTitle} - ${SITE_TITLE}`} 
+			description={`Search results for travel posts${searchQuery ? ` matching "${searchQuery}"` : ''}`} 
+		/>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<!-- Search Header -->
+			<div class="bg-gradient-to-br from-pink-50 via-white to-pink-25 py-12">
+				<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+					<div class="text-center">
+						<h1 class="title-font text-3xl md:text-4xl font-bold text-pink-400 mb-4">
+							{searchQuery ? `Search Results for "${searchQuery}"` : 'Search Travel Posts'}
+						</h1>
+						<p class="text-gray-600 max-w-2xl mx-auto">
+							{filteredPosts.length} post{filteredPosts.length !== 1 ? 's' : ''} found
+						</p>
+					</div>
+					
+					<!-- Advanced Search Form -->
+					<div class="mt-8 max-w-4xl mx-auto">
+						<form method="GET" action={url("/search")} class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+								<!-- Text Search -->
+								<div>
+									<label for="q" class="block text-sm font-medium text-gray-700 mb-1">
+										Search Text
+									</label>
+									<input
+										type="text"
+										id="q"
+										name="q"
+										value={searchQuery}
+										placeholder="Enter keywords..."
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm"
+									/>
+								</div>
+								
+								<!-- Country Filter -->
+								<div>
+									<label for="country" class="block text-sm font-medium text-gray-700 mb-1">
+										Country
+									</label>
+									<select
+										id="country"
+										name="country"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm"
+									>
+										<option value="">All Countries</option>
+										{countries.map((country) => (
+											<option value={country} selected={country === countryFilter}>
+												{country}
+											</option>
+										))}
+									</select>
+								</div>
+								
+								<!-- Continent Filter -->
+								<div>
+									<label for="continent" class="block text-sm font-medium text-gray-700 mb-1">
+										Continent
+									</label>
+									<select
+										id="continent"
+										name="continent"
+										class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-pink-400 text-sm"
+									>
+										<option value="">All Continents</option>
+										{continents.map((continent) => (
+											<option value={continent} selected={continent === continentFilter}>
+												{continent}
+											</option>
+										))}
+									</select>
+								</div>
+								
+								<!-- Search Button -->
+								<div class="flex items-end">
+									<button
+										type="submit"
+										class="w-full bg-pink-500 hover:bg-pink-600 text-white px-4 py-2 rounded-md font-medium transition-colors duration-200 flex items-center justify-center"
+									>
+										<i class="fas fa-search mr-2"></i>
+										Search
+									</button>
+								</div>
+							</div>
+							
+							<!-- Tags Section -->
+							{allTags.length > 0 && (
+								<div class="mt-4">
+									<label class="block text-sm font-medium text-gray-700 mb-2">
+										Tags (select multiple)
+									</label>
+									<div class="flex flex-wrap gap-2">
+										{allTags.map((tag) => (
+											<label class="inline-flex items-center">
+												<input
+													type="checkbox"
+													name="tags"
+													value={tag}
+													checked={tagsFilter.includes(tag)}
+													class="text-pink-500 border-gray-300 rounded focus:ring-pink-400 focus:ring-2"
+												/>
+												<span class="ml-2 text-sm text-gray-700">{tag}</span>
+											</label>
+										))}
+									</div>
+								</div>
+							)}
+						</form>
+					</div>
+				</div>
+			</div>
+
+			<!-- Results -->
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+				{filteredPosts.length > 0 ? (
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+						{filteredPosts.map((post) => (
+							<a 
+								href={url(`/blog/post-${post.postId}`)}
+								class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 block"
+							>
+								<div class="h-48 bg-gradient-to-br from-pink-100 to-blue-100 flex items-center justify-center">
+									<div class="text-center">
+										<i class="fas fa-camera text-4xl text-pink-400 mb-2"></i>
+										<p class="text-gray-600 text-sm">Photo coming soon</p>
+									</div>
+								</div>
+								<div class="p-6">
+									<div class="flex items-center text-sm text-pink-400 mb-2">
+										<i class="fas fa-map-marker-alt mr-1"></i>
+										<span>{post.locationName}</span>
+										<span class="mx-2">•</span>
+										<span>{post.countryName}</span>
+										<span class="mx-2">•</span>
+										<span>{post.continentName}</span>
+									</div>
+									<h3 class="title-font text-xl font-semibold text-gray-800 mb-3">
+										{post.postTitle.replace(/_/g, ' ')}
+									</h3>
+									<p class="text-gray-600 mb-4">
+										Read about my experiences and discoveries in {post.locationName}.
+									</p>
+									{post.tags.length > 0 && (
+										<div class="flex flex-wrap gap-2 mb-4">
+											{post.tags.map((tag) => (
+												<span class="inline-block bg-pink-100 text-pink-600 text-xs px-2 py-1 rounded-full">
+													{tag}
+												</span>
+											))}
+										</div>
+									)}
+									<div class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200">
+										Read more
+										<i class="fas fa-arrow-right ml-2"></i>
+									</div>
+								</div>
+							</a>
+						))}
+					</div>
+				) : (
+					<div class="text-center py-16">
+						<i class="fas fa-search text-6xl text-pink-300 mb-4"></i>
+						<h3 class="text-2xl font-semibold text-gray-600 mb-2">No posts found</h3>
+						<p class="text-gray-500 mb-6">
+							Try adjusting your search criteria or browse all posts.
+						</p>
+						<a 
+							href={url("/blog")}
+							class="inline-flex items-center bg-pink-500 hover:bg-pink-600 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+						>
+							<i class="fas fa-compass mr-2"></i>
+							Browse All Posts
+						</a>
+					</div>
+				)}
+			</div>
+		</main>
+		<Footer />
+
+		<style>
+			.line-clamp-1 {
+				display: -webkit-box;
+				-webkit-line-clamp: 1;
+				-webkit-box-orient: vertical;
+				overflow: hidden;
+			}
+		</style>
+	</body>
+</html>

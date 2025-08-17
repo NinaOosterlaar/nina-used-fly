@@ -28,3 +28,5 @@ pnpm-debug.log*
 
 # Redirection 
 .htaccess
+
+examples/

@@ -9,6 +9,7 @@ import { resolveImageUrl } from "../utils/image";
 
 // Get all blog posts sorted by publication date (newest first)
 const allPosts =  await getNumberOfEnrichedPosts();
+
 ---
 
 <!doctype html>
@@ -30,7 +31,7 @@ const allPosts =  await getNumberOfEnrichedPosts();
 							Every story, every journey, every adventure - all in one place
 						</p>
 						<div class="mt-6 text-sm text-pink-500">
-							{allPosts.length} locations and counting...
+							{allPosts.length} posts and counting...
 						</div>
 					</div>
 				</div>
