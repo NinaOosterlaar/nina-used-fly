@@ -116,6 +116,29 @@ console.log("All posts with tags:", allPostsWithTags);
 
 		<!-- Mobile menu -->
 		<div class="md:hidden hidden" id="mobile-menu">
+			<!-- Mobile Search Bar -->
+			<div class="px-4 pt-4 pb-3 border-b border-gray-200">
+				<div class="relative">
+					<form id="mobile-search-form" class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<i class="fas fa-search text-gray-400 text-sm"></i>
+						</div>
+						<input
+							id="mobile-search-input"
+							type="text"
+							placeholder="Search posts..."
+							class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:border-pink-300 text-sm"
+							autocomplete="off"
+						/>
+					</form>
+					
+					<!-- Mobile Search Results Dropdown -->
+					<div id="mobile-search-results" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden max-h-64 overflow-y-auto">
+						<!-- Results will be populated by JavaScript -->
+					</div>
+				</div>
+			</div>
+			
 			<div class="pt-2 pb-3 space-y-1">
 				<a
 					href={url("/")}
@@ -201,8 +224,10 @@ console.log("All posts with tags:", allPostsWithTags);
 		).slice(0, 8); // Limit to 8 results for dropdown
 	}
 
-	function displaySearchResults(results) {
-		const resultsContainer = document.getElementById('search-results');
+	function displaySearchResults(results, resultsContainer) {
+		if (!resultsContainer) {
+			resultsContainer = document.getElementById('search-results');
+		}
 		
 		if (results.length === 0) {
 			resultsContainer.classList.add('hidden');
@@ -260,61 +285,121 @@ console.log("All posts with tags:", allPostsWithTags);
 		const searchInput = document.getElementById('search-input');
 		const searchForm = document.getElementById('search-form');
 		const resultsContainer = document.getElementById('search-results');
+		const mobileSearchInput = document.getElementById('mobile-search-input');
+		const mobileSearchForm = document.getElementById('mobile-search-form');
+		const mobileResultsContainer = document.getElementById('mobile-search-results');
 		
-		if (!searchInput || !searchForm || !resultsContainer) return;
+		// Desktop search functionality
+		if (searchInput && searchForm && resultsContainer) {
+			let searchTimeout;
 
-		let searchTimeout;
+			// Search as user types
+			searchInput.addEventListener('input', function() {
+				clearTimeout(searchTimeout);
+				const query = this.value;
+				
+				if (!query.trim()) {
+					resultsContainer.classList.add('hidden');
+					return;
+				}
 
-		// Search as user types
-		searchInput.addEventListener('input', function() {
-			clearTimeout(searchTimeout);
-			const query = this.value;
-			
-			if (!query.trim()) {
-				resultsContainer.classList.add('hidden');
-				return;
-			}
+				searchTimeout = setTimeout(() => {
+					const results = searchPosts(query);
+					displaySearchResults(results, resultsContainer);
+				}, 300); // Debounce search
+			});
 
-			searchTimeout = setTimeout(() => {
-				const results = searchPosts(query);
-				displaySearchResults(results);
-			}, 300); // Debounce search
-		});
+			// Handle form submission - redirect to search page
+			searchForm.addEventListener('submit', function(e) {
+				e.preventDefault();
+				const query = searchInput.value.trim();
+				if (query) {
+					window.location.href = `/search?q=${encodeURIComponent(query)}`;
+				}
+			});
 
-		// Handle form submission - redirect to search page
-		searchForm.addEventListener('submit', function(e) {
-			e.preventDefault();
-			const query = searchInput.value.trim();
-			if (query) {
-				window.location.href = `/search?q=${encodeURIComponent(query)}`;
-			}
-		});
+			// Hide results when clicking outside
+			document.addEventListener('click', function(e) {
+				if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+					resultsContainer.classList.add('hidden');
+				}
+			});
 
-		// Hide results when clicking outside
-		document.addEventListener('click', function(e) {
-			if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
-				resultsContainer.classList.add('hidden');
-			}
-		});
+			// Show results when focusing on input (if there's a query)
+			searchInput.addEventListener('focus', function() {
+				if (this.value.trim()) {
+					const results = searchPosts(this.value);
+					displaySearchResults(results, resultsContainer);
+				}
+			});
 
-		// Show results when focusing on input (if there's a query)
-		searchInput.addEventListener('focus', function() {
-			if (this.value.trim()) {
-				const results = searchPosts(this.value);
-				displaySearchResults(results);
-			}
-		});
+			// Handle clicks on search results
+			resultsContainer.addEventListener('click', function(e) {
+				// Find the closest link element
+				const link = e.target.closest('a');
+				if (link && link.href) {
+					// Hide results and navigate
+					resultsContainer.classList.add('hidden');
+					window.location.href = link.href;
+				}
+			});
+		}
 
-		// Handle clicks on search results
-		resultsContainer.addEventListener('click', function(e) {
-			// Find the closest link element
-			const link = e.target.closest('a');
-			if (link && link.href) {
-				// Hide results and navigate
-				resultsContainer.classList.add('hidden');
-				window.location.href = link.href;
-			}
-		});
+		// Mobile search functionality
+		if (mobileSearchInput && mobileSearchForm && mobileResultsContainer) {
+			let mobileSearchTimeout;
+
+			// Search as user types
+			mobileSearchInput.addEventListener('input', function() {
+				clearTimeout(mobileSearchTimeout);
+				const query = this.value;
+				
+				if (!query.trim()) {
+					mobileResultsContainer.classList.add('hidden');
+					return;
+				}
+
+				mobileSearchTimeout = setTimeout(() => {
+					const results = searchPosts(query);
+					displaySearchResults(results, mobileResultsContainer);
+				}, 300); // Debounce search
+			});
+
+			// Handle form submission - redirect to search page
+			mobileSearchForm.addEventListener('submit', function(e) {
+				e.preventDefault();
+				const query = mobileSearchInput.value.trim();
+				if (query) {
+					window.location.href = `/search?q=${encodeURIComponent(query)}`;
+				}
+			});
+
+			// Hide results when clicking outside
+			document.addEventListener('click', function(e) {
+				if (!mobileSearchInput.contains(e.target) && !mobileResultsContainer.contains(e.target)) {
+					mobileResultsContainer.classList.add('hidden');
+				}
+			});
+
+			// Show results when focusing on input (if there's a query)
+			mobileSearchInput.addEventListener('focus', function() {
+				if (this.value.trim()) {
+					const results = searchPosts(this.value);
+					displaySearchResults(results, mobileResultsContainer);
+				}
+			});
+
+			// Handle clicks on search results
+			mobileResultsContainer.addEventListener('click', function(e) {
+				// Find the closest link element
+				const link = e.target.closest('a');
+				if (link && link.href) {
+					// Hide results and navigate
+					mobileResultsContainer.classList.add('hidden');
+					window.location.href = link.href;
+				}
+			});
+		}
 	}
 
 	// Initialize everything
