@@ -116,26 +116,6 @@ export async function getBlogPostByTitle(title: string, folderPath?: string): Pr
   }
 }
 
-export async function markPostAsPublished(title: string): Promise<boolean> {
-  try {
-    const dbTitle = titleToDbFormat(title);
-    
-    const result = await db
-      .update(post)
-      .set({ 
-        isPublished: 1,
-        updatedAt: new Date().toISOString()
-      })
-      .where(eq(post.title, dbTitle));
-
-    // console.log(`Marked post ${dbTitle} as published`);
-    return true;
-  } catch (error) {
-    console.error('Error marking post as published:', error);
-    return false;
-  }
-}
-
 export async function linkPostToTravel(postTitle: string, folderPath: string): Promise<boolean> {
   try {
     const dbPostTitle = titleToDbFormat(postTitle);

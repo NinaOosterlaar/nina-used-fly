@@ -17,7 +17,7 @@
     "@astrojs/netlify": "^6.5.6",
     "@astrojs/rss": "^4.0.12",
     "@astrojs/sitemap": "^3.4.1",
-    "@astrojs/vercel": "^8.2.5",
+
     "@tailwindcss/vite": "^4.1.10",
     "astro": "^5.10.1",
     "better-sqlite3": "^12.2.0",
