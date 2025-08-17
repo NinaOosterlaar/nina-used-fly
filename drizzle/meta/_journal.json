@@ -8,6 +8,13 @@
       "when": 1755096136071,
       "tag": "0000_clever_triton",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1755433258147,
+      "tag": "0001_add-coordinates-to-locations",
+      "breakpoints": true
     }
   ]
 }

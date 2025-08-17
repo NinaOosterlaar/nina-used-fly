@@ -303,3 +303,91 @@ export async function getNumberOfEnrichedPosts(number: number): Promise<Enriched
     return [];
   }
 }
+
+// Interface for posts with coordinates for map display
+export interface PostWithCoordinates {
+  id: number;
+  title: string;
+  startDate: string | null;
+  endDate: string | null;
+  locationName: string;
+  countryName: string;
+  latitude: string | null;
+  longitude: string | null;
+  url: string;
+  tags: string[];
+  description: string;
+}
+
+export async function getPostsWithCoordinates(): Promise<PostWithCoordinates[]> {
+  try {
+    const postsWithCoords = await db
+      .select({
+        id: post.id,
+        title: post.title,
+        startDate: post.startDate,
+        endDate: post.endDate,
+        locationName: location.name,
+        countryName: country.name,
+        latitude: location.latitude,
+        longitude: location.longitude,
+      })
+      .from(post)
+      .innerJoin(location, eq(post.locationId, location.id))
+      .innerJoin(country, eq(location.countryId, country.id))
+      .orderBy(desc(post.createdAt));
+
+    // Get all markdown posts to match with database posts
+    const markdownPosts = await getCollection('blog');
+
+    // Get tags for all posts
+    const allTags = await db
+      .select({
+        postId: postTags.postId,
+        tagName: tag.name,
+      })
+      .from(postTags)
+      .innerJoin(tag, eq(postTags.tagId, tag.id));
+
+    return await Promise.all(postsWithCoords.map(async p => {
+      // Convert database title format to markdown filename format for matching
+      const normalizedTitle = p.title
+        .toLowerCase()
+        .replace(/_/g, '-')
+        .normalize('NFD') // Decompose accented characters
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
+        .replace(/[^a-z0-9-]/g, '-') // Replace non-alphanumeric chars with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+      
+      // Find matching markdown post by comparing the slug (filename part)
+      const matchingMarkdown = markdownPosts.find(mdPost => {
+        const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
+        return slug === normalizedTitle;
+      });
+      
+      // Use the full markdown path if found, otherwise fallback to simple path
+      const url = matchingMarkdown 
+        ? `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
+        : `/blog/${normalizedTitle}`;
+      
+      // Get tags for this post
+      const postTagsList = allTags
+        .filter(tagData => tagData.postId === p.id)
+        .map(tagData => tagData.tagName);
+      
+      // Get description from markdown frontmatter
+      const description = matchingMarkdown?.data?.description || 'Explore this travel story';
+      
+      return {
+        ...p,
+        url,
+        tags: postTagsList,
+        description
+      };
+    }));
+  } catch (error) {
+    console.error('Error fetching posts with coordinates:', error);
+    return [];
+  }
+}
