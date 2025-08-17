@@ -1,6 +1,11 @@
 ---
 import { SITE_TITLE } from "../consts";
 import { url } from "../utils/url";
+import { getAllBlogPostsWithTags } from "../utils/search";
+
+// Get all blog posts with tags for search functionality
+const allPostsWithTags = await getAllBlogPostsWithTags();
+console.log("All posts with tags:", allPostsWithTags);
 ---
 
 <header>
@@ -18,6 +23,30 @@ import { url } from "../utils/url";
 						>
 					</a>
 				</div>
+				
+				<!-- Search Bar -->
+				<div class="hidden md:flex flex-1 justify-center items-center px-6">
+					<div class="w-full max-w-sm relative">
+						<form id="search-form" class="relative">
+							<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+								<i class="fas fa-search text-gray-400 text-xs"></i>
+							</div>
+							<input
+								id="search-input"
+								type="text"
+								placeholder="Search posts..."
+								class="block w-full pl-8 pr-3 py-1 border border-gray-200 rounded-full leading-5 bg-gray-50 placeholder-gray-400 focus:outline-none focus:bg-white focus:border-pink-300 text-sm h-8"
+								autocomplete="off"
+							/>
+						</form>
+						
+						<!-- Search Results Dropdown -->
+						<div id="search-results" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden max-h-80 overflow-y-auto">
+							<!-- Results will be populated by JavaScript -->
+						</div>
+					</div>
+				</div>
+				
 				<div
 					class="hidden md:ml-6 md:flex md:items-center md:space-x-8"
 				>
@@ -87,6 +116,29 @@ import { url } from "../utils/url";
 
 		<!-- Mobile menu -->
 		<div class="md:hidden hidden" id="mobile-menu">
+			<!-- Mobile Search Bar -->
+			<div class="px-4 pt-4 pb-3 border-b border-gray-200">
+				<div class="relative">
+					<form id="mobile-search-form" class="relative">
+						<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+							<i class="fas fa-search text-gray-400 text-sm"></i>
+						</div>
+						<input
+							id="mobile-search-input"
+							type="text"
+							placeholder="Search posts..."
+							class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-400 focus:outline-none focus:border-pink-300 text-sm"
+							autocomplete="off"
+						/>
+					</form>
+					
+					<!-- Mobile Search Results Dropdown -->
+					<div id="mobile-search-results" class="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 hidden max-h-64 overflow-y-auto">
+						<!-- Results will be populated by JavaScript -->
+					</div>
+				</div>
+			</div>
+			
 			<div class="pt-2 pb-3 space-y-1">
 				<a
 					href={url("/")}
@@ -129,7 +181,7 @@ import { url } from "../utils/url";
 	</nav>
 </header>
 
-<script>
+<script define:vars={{ allPostsWithTags }}>
 	// Mobile menu toggle functionality
 	function initializeMobileMenu() {
 		const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -154,10 +206,212 @@ import { url } from "../utils/url";
 		}
 	}
 
+	// Search functionality
+	function normalizeSearchText(text) {
+		return text
+			.normalize('NFD')
+			.replace(/[\u0300-\u036f]/g, '')
+			.toLowerCase();
+	}
+
+	function searchPosts(query) {
+		if (!query.trim()) return [];
+		
+		const normalizedQuery = normalizeSearchText(query.trim());
+		
+		return allPostsWithTags.filter(post => 
+			post.searchableText.includes(normalizedQuery)
+		).slice(0, 8); // Limit to 8 results for dropdown
+	}
+
+	function displaySearchResults(results, resultsContainer) {
+		if (!resultsContainer) {
+			resultsContainer = document.getElementById('search-results');
+		}
+		
+		if (results.length === 0) {
+			resultsContainer.classList.add('hidden');
+			return;
+		}
+
+		resultsContainer.innerHTML = results.map(post => {
+			// Use the proper markdown URL if available, otherwise fallback to constructed URL
+			let postUrl;
+			if (post.markdownData?.url) {
+				postUrl = post.markdownData.url;
+			} else {
+				// Fallback to manual construction (for posts without markdown data)
+				let folderName = '';
+				if (post.travelTitle) {
+					folderName = post.travelTitle.toLowerCase().replace(/_/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+				} else if (post.planTitle) {
+					folderName = post.planTitle.toLowerCase().replace(/_/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+				}
+				
+				const postSlug = post.postTitle.toLowerCase().replace(/_/g, '-').normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+				postUrl = folderName ? `/blog/${folderName}/${postSlug}` : `/blog/${postSlug}`;
+			}
+			
+			return `
+			<a href="${postUrl}" class="block px-4 py-3 hover:bg-pink-50 border-b border-gray-100 last:border-b-0">
+				<div class="flex items-start justify-between">
+					<div class="flex-1">
+						<h4 class="text-sm font-medium text-gray-900 line-clamp-1">
+							${post.postTitle.replace(/_/g, ' ')}
+						</h4>
+						<p class="text-xs text-gray-500 mt-1">
+							<i class="fas fa-map-marker-alt mr-1"></i>
+							${post.locationName}, ${post.countryName}
+						</p>
+						${post.tags.length > 0 ? `
+							<div class="flex flex-wrap gap-1 mt-2">
+								${post.tags.slice(0, 3).map(tag => `
+									<span class="inline-block bg-pink-100 text-pink-600 text-xs px-2 py-0.5 rounded-full">
+										${tag}
+									</span>
+								`).join('')}
+								${post.tags.length > 3 ? `<span class="text-xs text-gray-400">+${post.tags.length - 3} more</span>` : ''}
+							</div>
+						` : ''}
+					</div>
+				</div>
+			</a>
+		`}).join('');
+
+		resultsContainer.classList.remove('hidden');
+	}
+
+	function initializeSearch() {
+		const searchInput = document.getElementById('search-input');
+		const searchForm = document.getElementById('search-form');
+		const resultsContainer = document.getElementById('search-results');
+		const mobileSearchInput = document.getElementById('mobile-search-input');
+		const mobileSearchForm = document.getElementById('mobile-search-form');
+		const mobileResultsContainer = document.getElementById('mobile-search-results');
+		
+		// Desktop search functionality
+		if (searchInput && searchForm && resultsContainer) {
+			let searchTimeout;
+
+			// Search as user types
+			searchInput.addEventListener('input', function() {
+				clearTimeout(searchTimeout);
+				const query = this.value;
+				
+				if (!query.trim()) {
+					resultsContainer.classList.add('hidden');
+					return;
+				}
+
+				searchTimeout = setTimeout(() => {
+					const results = searchPosts(query);
+					displaySearchResults(results, resultsContainer);
+				}, 300); // Debounce search
+			});
+
+			// Handle form submission - redirect to search page
+			searchForm.addEventListener('submit', function(e) {
+				e.preventDefault();
+				const query = searchInput.value.trim();
+				if (query) {
+					window.location.href = `/search?q=${encodeURIComponent(query)}`;
+				}
+			});
+
+			// Hide results when clicking outside
+			document.addEventListener('click', function(e) {
+				if (!searchInput.contains(e.target) && !resultsContainer.contains(e.target)) {
+					resultsContainer.classList.add('hidden');
+				}
+			});
+
+			// Show results when focusing on input (if there's a query)
+			searchInput.addEventListener('focus', function() {
+				if (this.value.trim()) {
+					const results = searchPosts(this.value);
+					displaySearchResults(results, resultsContainer);
+				}
+			});
+
+			// Handle clicks on search results
+			resultsContainer.addEventListener('click', function(e) {
+				// Find the closest link element
+				const link = e.target.closest('a');
+				if (link && link.href) {
+					// Hide results and navigate
+					resultsContainer.classList.add('hidden');
+					window.location.href = link.href;
+				}
+			});
+		}
+
+		// Mobile search functionality
+		if (mobileSearchInput && mobileSearchForm && mobileResultsContainer) {
+			let mobileSearchTimeout;
+
+			// Search as user types
+			mobileSearchInput.addEventListener('input', function() {
+				clearTimeout(mobileSearchTimeout);
+				const query = this.value;
+				
+				if (!query.trim()) {
+					mobileResultsContainer.classList.add('hidden');
+					return;
+				}
+
+				mobileSearchTimeout = setTimeout(() => {
+					const results = searchPosts(query);
+					displaySearchResults(results, mobileResultsContainer);
+				}, 300); // Debounce search
+			});
+
+			// Handle form submission - redirect to search page
+			mobileSearchForm.addEventListener('submit', function(e) {
+				e.preventDefault();
+				const query = mobileSearchInput.value.trim();
+				if (query) {
+					window.location.href = `/search?q=${encodeURIComponent(query)}`;
+				}
+			});
+
+			// Hide results when clicking outside
+			document.addEventListener('click', function(e) {
+				if (!mobileSearchInput.contains(e.target) && !mobileResultsContainer.contains(e.target)) {
+					mobileResultsContainer.classList.add('hidden');
+				}
+			});
+
+			// Show results when focusing on input (if there's a query)
+			mobileSearchInput.addEventListener('focus', function() {
+				if (this.value.trim()) {
+					const results = searchPosts(this.value);
+					displaySearchResults(results, mobileResultsContainer);
+				}
+			});
+
+			// Handle clicks on search results
+			mobileResultsContainer.addEventListener('click', function(e) {
+				// Find the closest link element
+				const link = e.target.closest('a');
+				if (link && link.href) {
+					// Hide results and navigate
+					mobileResultsContainer.classList.add('hidden');
+					window.location.href = link.href;
+				}
+			});
+		}
+	}
+
+	// Initialize everything
+	function initialize() {
+		initializeMobileMenu();
+		initializeSearch();
+	}
+
 	// Initialize immediately if DOM is ready, otherwise wait for it
 	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', initializeMobileMenu);
+		document.addEventListener('DOMContentLoaded', initialize);
 	} else {
-		initializeMobileMenu();
+		initialize();
 	}
 </script>
