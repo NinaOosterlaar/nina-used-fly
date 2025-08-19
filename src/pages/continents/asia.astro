@@ -49,7 +49,7 @@ const defaultImage = fidoughImage.src;
 					<h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
 						Asia
 					</h1>
-					<p class="text-gray-600 max-w-2xl mx-auto">
+					<p class="text-gray-600 max-w-3xl mx-auto md:text-xl">
 						Exploring the diverse cultures, ancient traditions, and modern innovations across Asia. 
 						Here are the countries that I have visited and documented my travels in.
 					</p>
@@ -59,7 +59,7 @@ const defaultImage = fidoughImage.src;
 				{asianCountriesWithPosts.length > 0 ? (
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
 						{asianCountriesWithPosts.map((countryData) => (
-							<div onclick={`location.href='${url(`/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}'`} class="country-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
+							<div onclick={`location.href='${url(`/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}'`} class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
 								<div class="h-48 overflow-hidden">
 									<img
 										src={getCountryHeroImage(countryData.countryName, defaultImage)}

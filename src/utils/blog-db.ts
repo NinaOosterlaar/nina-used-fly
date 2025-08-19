@@ -42,6 +42,12 @@ function folderToTravelTitle(path: string): string {
     .join('_');
 }
 
+// Convert database travel title to normalized format
+export function travelTitleToNormal(title: string): string {
+  return title
+    .replace(/_/g, ' ');
+}
+
 export async function getBlogPostByTitle(title: string, folderPath?: string): Promise<BlogPostMetadata | null> {
   try {
     const dbTitle = titleToDbFormat(title);
