@@ -52,9 +52,9 @@ const defaultImage = fidoughImage.src;
 
 				<!-- Work in Progress Section -->
 				{travelWithPosts.length > 0 ? (
-					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
 						{travelWithPosts.map((travelData) => (
-							<div onclick={'location.href=#'} class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer" >
+							<div onclick={'location.href=#'} class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col" >
 								<div class="h-48 overflow-hidden">
 									<img
 										src={getTravelHeroImage(travelTitleToNormal(travelData.title), defaultImage)}
@@ -62,7 +62,7 @@ const defaultImage = fidoughImage.src;
 										class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
 									/>
 								</div>
-								<div class="p-6">
+								<div class="p-6 flex flex-col flex-grow">
 									<div class="flex items-center justify-between mb-3">
 										<h3 class="title-font text-xl font-semibold text-gray-800">
 											{travelTitleToNormal(travelData.title)}
@@ -71,7 +71,7 @@ const defaultImage = fidoughImage.src;
 											{travelData.postCount} {travelData.postCount === 1 ? 'post' : 'posts'}
 										</span>
 									</div>
-									<p class="text-gray-600 mb-4">
+									<p class="text-gray-600 mb-4 flex-grow">
 										{getTravelPreview(travelTitleToNormal(travelData.title))}
 									</p>
 									<a
