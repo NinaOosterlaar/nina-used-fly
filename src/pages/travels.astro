@@ -54,7 +54,7 @@ const defaultImage = fidoughImage.src;
 				{travelWithPosts.length > 0 ? (
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
 						{travelWithPosts.map((travelData) => (
-							<div onclick={'location.href=#'} class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col" >
+							<div onclick={`location.href='/${travelData.title.toLowerCase()}'`} class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col" >
 								<div class="h-48 overflow-hidden">
 									<img
 										src={getTravelHeroImage(travelTitleToNormal(travelData.title), defaultImage)}
@@ -67,7 +67,7 @@ const defaultImage = fidoughImage.src;
 										<h3 class="title-font text-xl font-semibold text-gray-800">
 											{travelTitleToNormal(travelData.title)}
 										</h3>
-										<span class="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm font-medium" >
+										<span class="bg-pink-100 text-pink-600 px-2.5 py-1 rounded-full text-sm font-medium" >
 											{travelData.postCount} {travelData.postCount === 1 ? 'post' : 'posts'}
 										</span>
 									</div>
@@ -75,7 +75,7 @@ const defaultImage = fidoughImage.src;
 										{getTravelPreview(travelTitleToNormal(travelData.title))}
 									</p>
 									<a
-										href="#" class = "inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200"
+										href={`/${travelData.title.toLowerCase()}`} class = "inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200"
 									>
 										Go on this journey with me!
 										<i class="fas fa-arrow-right ml-2"></i>

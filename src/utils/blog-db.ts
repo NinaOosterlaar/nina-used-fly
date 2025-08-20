@@ -10,10 +10,10 @@ export interface BlogPostMetadata {
   endDate: string | null;
   createdAt: string;
   updatedAt: string | null;
-  isPublished: boolean;
   tags: string[];
   location: string | null;
   travelTitle: string | null;
+  countryName?: string; // Optional, only if needed for enriched posts
 }
 
 export interface EnrichedBlogPost extends BlogPostMetadata {
@@ -62,7 +62,6 @@ export async function getBlogPostByTitle(title: string, folderPath?: string): Pr
         endDate: post.endDate,
         createdAt: post.createdAt,
         updatedAt: post.updatedAt,
-        isPublished: post.isPublished,
         locationName: location.name,
         travelId: post.travelId,
       })
@@ -111,7 +110,6 @@ export async function getBlogPostByTitle(title: string, folderPath?: string): Pr
       endDate: postData.endDate,
       createdAt: postData.createdAt,
       updatedAt: postData.updatedAt,
-      isPublished: Boolean(postData.isPublished),
       tags: tagsResult.map(t => t.name),
       location: postData.locationName,
       travelTitle: travelTitle,
@@ -171,7 +169,6 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
         postStartDate: post.startDate,
         postEndDate: post.endDate,
         postCreatedAt: post.createdAt,
-        postIsPublished: post.isPublished,
         locationName: location.name,
         countryName: country.name,
       })
@@ -216,7 +213,6 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
         endDate: dbPost.postEndDate,
         createdAt: dbPost.postCreatedAt,
         updatedAt: null,
-        isPublished: Boolean(dbPost.postIsPublished),
         tags: [],
         location: dbPost.locationName,
         travelTitle: null,
@@ -242,6 +238,86 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
   }
 }
 
+// Function to get entriched posts for a specific travel
+export async function getEnrichedPostsForTravel(travelTitle: string): Promise<EnrichedBlogPost[]> {
+  try {
+    // Get all posts from the database for the specified travel with proper joins, ordered by start date
+    const dbPosts = await db
+      .select({
+        postId: post.id,
+        postTitle: post.title,
+        postStartDate: post.startDate,
+        postEndDate: post.endDate,
+        postCreatedAt: post.createdAt,
+        locationName: location.name,
+        countryName: country.name,
+      })
+      .from(post)
+      .innerJoin(location, eq(post.locationId, location.id))
+      .innerJoin(country, eq(location.countryId, country.id))
+      .innerJoin(travel, eq(post.travelId, travel.id))
+      .where(eq(travel.title, travelTitle))
+      .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
+      .all();
+
+      console.log(`Found ${dbPosts.length} posts for travel: ${travelTitle}`);
+
+      const enrichedPosts: EnrichedBlogPost[] = [];
+
+    // Get all markdown posts
+    const markdownPosts = await getCollection('blog');
+
+    for (const dbPost of dbPosts) {
+      // Convert database title format to markdown filename format
+      let dbTitleFormatted = dbPost.postTitle
+        .toLowerCase()
+        .replace(/_/g, '-')
+        .normalize('NFD') // Decompose accented characters
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
+        .replace(/[^a-z0-9-]/g, '-') // Replace non-alphanumeric chars with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+      
+      // Find matching markdown post
+      const matchingMarkdown = markdownPosts.find(mdPost => {
+        const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
+        return slug === dbTitleFormatted;
+      });
+
+      const enrichedPost: EnrichedBlogPost = {
+        id: dbPost.postId,
+        title: dbPost.postTitle,
+        startDate: dbPost.postStartDate,
+        endDate: dbPost.postEndDate,
+        createdAt: dbPost.postCreatedAt,
+        updatedAt: null,
+        tags: [],
+        location: dbPost.locationName,
+        travelTitle: travelTitle,
+        countryName: dbPost.countryName,
+      };
+
+      if (matchingMarkdown) {
+        enrichedPost.markdownData = {
+          description: matchingMarkdown.data.description,
+          heroImage: matchingMarkdown.data.heroImage,
+          pubDate: matchingMarkdown.data.pubDate,
+          slug: matchingMarkdown.id,
+          url: `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
+        };
+      }
+
+      enrichedPosts.push(enrichedPost);
+    }
+
+    return enrichedPosts;
+  } catch (error) {
+    console.error('Error fetching enriched blog posts for travel:', error);
+    return [];
+  }
+}
+
+// Function to get number of enriched posts
 export async function getNumberOfEnrichedPosts(number: number): Promise<EnrichedBlogPost[]> {
   try {
     // Get the latest 'number' of posts from the database
@@ -252,7 +328,6 @@ export async function getNumberOfEnrichedPosts(number: number): Promise<Enriched
         postStartDate: post.startDate,
         postEndDate: post.endDate,
         postCreatedAt: post.createdAt,
-        postIsPublished: post.isPublished,
         locationName: location.name,
       })
       .from(post)
@@ -284,7 +359,6 @@ export async function getNumberOfEnrichedPosts(number: number): Promise<Enriched
         endDate: dbPost.postEndDate,
         createdAt: dbPost.postCreatedAt,
         updatedAt: null,
-        isPublished: Boolean(dbPost.postIsPublished),
         tags: [],
         location: dbPost.locationName,
         travelTitle: null,
