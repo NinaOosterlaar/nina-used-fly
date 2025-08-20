@@ -1,0 +1,102 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+import { getTravelDescription, travelConfig } from '../config/travels';
+import { getEnrichedPostsForTravel } from '../utils/blog-db';
+import { url } from '../utils/url';
+import { resolveImageUrl } from '../utils/image';
+
+export async function getStaticPaths() {
+    // Get all travels from the config
+    const travels = Object.keys(travelConfig);
+    
+    return travels.map((travelName) => ({
+        params: { travel: travelName.toLowerCase().replace(/ /g, '_') },
+        props: { travelName },
+    }));
+}
+
+const { travel } = Astro.params;
+const { travelName } = Astro.props;
+
+const travelPosts = await getEnrichedPostsForTravel(travelName.replace(/ /g, '_'));
+
+console.log(`Travel posts for ${travelName.replace(/ /g, '_')}:`, travelPosts);
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <BaseHead title={`${travelName} - ${SITE_TITLE}`} description={`My destinations and adventures during ${travelName}`} />
+    </head>
+    <body>
+        <Header />
+        <main>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <!-- Page Header -->
+                <div class="text-center mb-12">
+                    <h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
+                        {travelName}
+                    </h1>
+                    <p class="text-gray-600 max-w-4xl mx-auto md:text-xl">
+                        {getTravelDescription(travelName)}
+                    </p>
+                </div>
+
+                <!-- Posts Grid -->
+                {travelPosts.length > 0 ? (
+                        <div class={`grid gap-8 ${travelPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : travelPosts.length === 2  ? "max-w-xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                            {travelPosts.map((postData) => (
+                            <a 
+                                href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
+                                class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
+                            >
+                                <div class={`overflow-hidden ${travelPosts.length <= 2 ? "h-80" : "h-48"}`}>
+                                    {postData.markdownData?.heroImage ? (
+                                        <img 
+                                            src={resolveImageUrl(postData.markdownData.heroImage)}
+                                            alt={postData.title}
+                                            class="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <img 
+                                            src="/default-hero-image.jpg" 
+                                            alt="Default Hero Image" 
+                                            class="w-full h-full object-cover"
+                                        />
+                                    )}
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-center text-sm text-pink-400 mb-2">
+										<i class="fas fa-map-marker-alt mr-1"></i>
+										<span>{postData.location}</span>
+										{postData.startDate && (
+											<>
+												<span class="mx-2">•</span>
+												<span>
+													{new Date(postData.startDate).toLocaleDateString('en-GB')}
+													{postData.endDate && (
+														<> - {new Date(postData.endDate).toLocaleDateString('en-GB')}</>
+													)}
+												</span>
+											</>
+										)}
+									</div>
+                                    <h3 class="title-font text-xl font-semibold text-gray-800 mb-3">{postData.title.replace(/_/g, ' ') || `Post ${postData.id}`}</h2>
+                                    <p class="text-gray-600 mb-4">{postData.markdownData?.description || 'Read about my experiences.'}</p>
+                                    <span class="text-pink-500 font-medium">Read more</span>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                ) : (
+                    <p class="text-center text-gray-500">No posts found for this travel.</p>
+                )}
+            </div>
+        </main>
+        <Footer />
+    </body>
+</html>
