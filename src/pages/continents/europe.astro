@@ -4,7 +4,7 @@ import Header from '../../components/Header.astro';
 import Footer from '../../components/Footer.astro';
 import { SITE_TITLE } from '../../consts';
 import { db } from '../../db';
-import { continent, country, location, post } from '../../db/schema';
+import { continent, country, location, post, travel } from '../../db/schema';
 import { eq, and, sql, count } from 'drizzle-orm';
 import fidoughImage from '../../assets/fidough.png';
 import { getCountryPreview, getCountryHeroImage } from '../../config/countries';
@@ -22,6 +22,7 @@ const europeanCountriesWithPosts = await db
   .innerJoin(country, eq(country.continentId, continent.id))
   .innerJoin(location, eq(location.countryId, country.id))
   .innerJoin(post, eq(post.locationId, location.id)) // Get all posts regardless of published status
+  .innerJoin(travel, eq(post.travelId, travel.id)) // Ensure posts have a travel association
   .where(eq(continent.name, 'Europe'))
   .groupBy(country.id, country.name)
   .orderBy(sql`MAX(${post.startDate}) DESC`) // Order by most recent post date

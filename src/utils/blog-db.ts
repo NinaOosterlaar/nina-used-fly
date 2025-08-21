@@ -332,6 +332,7 @@ export async function getNumberOfEnrichedPosts(number: number): Promise<Enriched
       })
       .from(post)
       .innerJoin(location, eq(post.locationId, location.id))
+      .innerJoin(travel, eq(post.travelId, travel.id))
       .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
       .limit(number)
       .all();
@@ -415,6 +416,7 @@ export async function getPostsWithCoordinates(): Promise<PostWithCoordinates[]> 
       .from(post)
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
+      .innerJoin(travel, eq(post.travelId, travel.id)) // Ensure posts have a travel association
       .orderBy(desc(post.createdAt));
 
     // Get all markdown posts to match with database posts
