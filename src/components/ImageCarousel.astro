@@ -3,6 +3,7 @@ export interface Props {
   images: Array<{
     src: string;
     alt: string;
+    description?: string;
   }>;
   maxWidth?: string;
   maxHeight?: string;
@@ -65,7 +66,16 @@ const uniqueId = `${id}-${Math.random().toString(36).substr(2, 9)}`;
     </div>
   )}
   
-  <!-- Optional Description -->
+  <!-- Individual Image Description (only show if current image has a description) -->
+  {images.some(img => img.description) && (
+    <div id={`${uniqueId}-image-desc`} style="margin-top: 8px; min-height: 20px;">
+      <p style="color: #6b7280; font-size: 14px; margin: 0; opacity: 0.9;">
+        {images[0].description || ''}
+      </p>
+    </div>
+  )}
+
+  <!-- Optional General Description -->
   {description && (
     <p style="margin-top: 12px; color: #6b7280; font-style: italic; font-size: 14px; max-width: 400px; margin-left: auto; margin-right: auto;">
       {description}
@@ -109,12 +119,13 @@ const uniqueId = `${id}-${Math.random().toString(36).substr(2, 9)}`;
   }
 </style>
 
-<script define:vars={{ uniqueId, totalSlides: images.length }}>
+<script define:vars={{ uniqueId, totalSlides: images.length, imageDescriptions: images.map(img => img.description || '') }}>
   if (totalSlides > 1) {
     const carousel = document.getElementById(`${uniqueId}-track`);
     const prevBtn = document.getElementById(`${uniqueId}-prev`);
     const nextBtn = document.getElementById(`${uniqueId}-next`);
     const dots = document.querySelectorAll(`.${uniqueId}-dot`);
+    const imageDescContainer = document.getElementById(`${uniqueId}-image-desc`);
     
     let currentSlide = 0;
     
@@ -129,6 +140,15 @@ const uniqueId = `${id}-${Math.random().toString(36).substr(2, 9)}`;
           dot.style.background = '#d1d5db';
         }
       });
+      
+      // Update individual image description
+      if (imageDescContainer) {
+        const descParagraph = imageDescContainer.querySelector('p');
+        if (descParagraph) {
+          descParagraph.textContent = imageDescriptions[currentSlide] || '';
+          descParagraph.style.opacity = imageDescriptions[currentSlide] ? '0.9' : '0';
+        }
+      }
     }
     
     function nextSlide() {
@@ -154,5 +174,18 @@ const uniqueId = `${id}-${Math.random().toString(36).substr(2, 9)}`;
     dots.forEach((dot, index) => {
       dot.addEventListener('click', () => goToSlide(index));
     });
+    
+    // Initialize the first image description
+    updateCarousel();
+  } else {
+    // Handle single image description display
+    const imageDescContainer = document.getElementById(`${uniqueId}-image-desc`);
+    if (imageDescContainer && imageDescriptions[0]) {
+      const descParagraph = imageDescContainer.querySelector('p');
+      if (descParagraph) {
+        descParagraph.textContent = imageDescriptions[0];
+        descParagraph.style.opacity = '0.9';
+      }
+    }
   }
 </script>
