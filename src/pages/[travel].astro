@@ -32,6 +32,15 @@ console.log(`Travel posts for ${travelName.replace(/ /g, '_')}:`, travelPosts);
     <head>
     <BaseHead title={`${travelName} - ${SITE_TITLE}`} description={`My destinations and adventures during ${travelName}`} />
     </head>
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
     <body>
         <Header />
         <main>
