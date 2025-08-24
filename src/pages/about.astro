@@ -21,6 +21,15 @@ if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate
 	<head>
 		<BaseHead title={`About - ${SITE_TITLE}`} description="Learn more about Nina and her travel adventures" />
 	</head>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
 	<body>
 		<Header />
 		<main>

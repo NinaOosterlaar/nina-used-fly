@@ -32,6 +32,15 @@ console.log(`Travel posts for ${travelName.replace(/ /g, '_')}:`, travelPosts);
     <head>
     <BaseHead title={`${travelName} - ${SITE_TITLE}`} description={`My destinations and adventures during ${travelName}`} />
     </head>
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
     <body>
         <Header />
         <main>
@@ -48,7 +57,7 @@ console.log(`Travel posts for ${travelName.replace(/ /g, '_')}:`, travelPosts);
 
                 <!-- Posts Grid -->
                 {travelPosts.length > 0 ? (
-                        <div class={`grid gap-8 ${travelPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : travelPosts.length === 2  ? "max-w-xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                        <div class={`grid gap-8 ${travelPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : travelPosts.length === 2  ? "max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
                             {travelPosts.map((postData) => (
                             <a 
                                 href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
