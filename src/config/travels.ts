@@ -42,7 +42,3 @@ export function getTravelDescription(travelName: string): string {
 export function getTravelHeroImage(travelName: string, fallbackImage?: string): string {
   return travelConfig[travelName]?.heroImage || fallbackImage || '/assets/fidough.png';
 }
-
-export function getTravelFlag(travelName: string): string {
-  return travelConfig[travelName]?.flag || '🌍';
-}

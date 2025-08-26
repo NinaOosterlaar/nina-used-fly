@@ -20,7 +20,7 @@ const travelWithPosts = await db.select({
 	})
 	.from(travel)
 	.innerJoin(post, eq(post.travelId, travel.id))
-	.groupBy(travel.id, travel.title, travel.startDate, travel	.endDate)
+	.groupBy(travel.id, travel.title, travel.startDate, travel.endDate)
 	.orderBy(sql`MAX(${post.startDate}) DESC`) // Order by most recent post date
 	.all();
 // console.log('Travel with posts:', travelWithPosts);
@@ -59,7 +59,6 @@ const defaultImage = fidoughImage.src;
 					</p>
 				</div>
 
-				<!-- Work in Progress Section -->
 				{travelWithPosts.length > 0 ? (
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
 						{travelWithPosts.map((travelData) => (

@@ -23,8 +23,6 @@ const { travelName } = Astro.props;
 
 const travelPosts = await getEnrichedPostsForTravel(travelName.replace(/ /g, '_'));
 
-console.log(`Travel posts for ${travelName.replace(/ /g, '_')}:`, travelPosts);
-
 ---
 
 <!DOCTYPE html>
