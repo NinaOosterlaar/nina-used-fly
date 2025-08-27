@@ -3,7 +3,31 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { SITE_TITLE } from '../consts';
-import clefairyAtWorkImage from '../assets/clefairy_at_work.png';
+import { db } from '../db';
+import { travel, post } from '../db/schema';
+import { eq, and, sql, count } from 'drizzle-orm';
+import fidoughImage from '../assets/fidough.png';
+import { getTravelPreview, getTravelHeroImage } from '../config/travels';
+import { travelTitleToNormal } from '../utils/blog-db';
+
+// Get all travels associated with blog posts
+const travelWithPosts = await db.select({
+		travelId: travel.id,
+		title: travel.title,
+		startDate: travel.startDate,
+		postCount: count(post.id),
+		endDate: travel.endDate,
+	})
+	.from(travel)
+	.innerJoin(post, eq(post.travelId, travel.id))
+	.groupBy(travel.id, travel.title, travel.startDate, travel.endDate)
+	.orderBy(sql`MAX(${post.startDate}) DESC`) // Order by most recent post date
+	.all();
+// console.log('Travel with posts:', travelWithPosts);
+
+
+// Default image for travels without specific images
+const defaultImage = fidoughImage.src;
 ---
 
 <!DOCTYPE html>
@@ -11,6 +35,15 @@ import clefairyAtWorkImage from '../assets/clefairy_at_work.png';
 	<head>
 		<BaseHead title={`Travels - ${SITE_TITLE}`} description="My travel experiences and adventures" />
 	</head>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
 	<body>
 		<Header />
 		<main>
@@ -20,35 +53,49 @@ import clefairyAtWorkImage from '../assets/clefairy_at_work.png';
 					<h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
 						Travels
 					</h1>
-					<p class="text-gray-600 max-w-2xl mx-auto">
+					<p class="text-gray-600 max-w-3xl mx-auto md:text-xl">
 						This page is dedicated to my individual travels. They are grouped together to show a consecutive journey I took. 
+						They range from a collection of day trips in The Netherlands to longer trips abroad to multiple destinations.
 					</p>
 				</div>
 
-				<!-- Work in Progress Section -->
-				<div class="text-center">
-					<div class="mb-8">
-						<video 
-							width="480" 
-							height="192" 
-							autoplay 
-							loop 
-							muted 
-							playsinline
-							class="mx-auto mt-4 rounded-lg"
-						>
-							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.mp4" type="video/mp4">
-							<source src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.webm" type="video/webm">
-							<!-- Fallback to GIF for older browsers -->
-							<img src="https://media.giphy.com/media/6aOp0QSnZDerNlZn5c/giphy.gif" alt="Clefairy Pokemon" width="480" height="192" />
-						</video>
+				{travelWithPosts.length > 0 ? (
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
+						{travelWithPosts.map((travelData) => (
+							<div onclick={`location.href='/${travelData.title.toLowerCase()}'`} class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer flex flex-col" >
+								<div class="h-48 overflow-hidden">
+									<img
+										src={getTravelHeroImage(travelTitleToNormal(travelData.title), defaultImage)}
+										alt={travelTitleToNormal(travelData.title)}
+										class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+									/>
+								</div>
+								<div class="p-6 flex flex-col flex-grow">
+									<div class="flex items-center justify-between mb-3">
+										<h3 class="title-font text-xl font-semibold text-gray-800 gap-3">
+											{travelTitleToNormal(travelData.title)}
+										</h3>
+										<span class="bg-pink-100 text-pink-600 px-2.5 py-1 rounded-full text-sm font-medium min-w-[72px]" >
+											{travelData.postCount} {travelData.postCount === 1 ? 'post' : 'posts'}
+										</span>
+									</div>
+									<p class="text-gray-600 mb-4 flex-grow">
+										{getTravelPreview(travelTitleToNormal(travelData.title))}
+									</p>
+									<a
+										href={`/${travelData.title.toLowerCase()}`} class = "inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200"
+									>
+										Go on this journey with me!
+										<i class="fas fa-arrow-right ml-2"></i>
+									</a>
+								</div>
+							</div>
+						))}
 					</div>
-					<h2 class="text-3xl font-bold text-gray-800 mb-4">Work in Progress</h2>
-					<p class="text-gray-600 text-lg max-w-md mx-auto">
-						I'm currently working on organizing all my travel stories and experiences. 
-						Check back soon for exciting content!
-					</p>
-				</div>
+				) : (
+					<p class="text-gray-600 text-center">No travels found.</p>
+				)
+				}
 			</div>
 		</main>
 		<Footer />

@@ -71,7 +71,7 @@ const displayEndDate = dbMetadata?.endDate
 					#ffffff 50%,
 					#fef7f0 100%
 				);
-				padding: 3rem 0 4rem 0;
+				padding: 3rem 0 1rem 0;
 				position: relative;
 				overflow: hidden;
 			}
@@ -232,7 +232,7 @@ const displayEndDate = dbMetadata?.endDate
 			.prose {
 				max-width: none;
 				margin: 0;
-				padding: 3rem;
+				padding: 0rem 3rem 3rem 3rem;
 				color: #374151;
 				line-height: 1.7;
 				font-size: 1.1rem;
@@ -266,6 +266,15 @@ const displayEndDate = dbMetadata?.endDate
 			}
 		</style>
 	</head>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
 
 	<body>
 		<Header />
