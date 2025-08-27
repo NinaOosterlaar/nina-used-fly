@@ -571,3 +571,59 @@ export async function getPostsWithCoordinates(): Promise<PostWithCoordinates[]> 
     return [];
   }
 }
+
+// Function to get all published posts that are NOT plans (plan_id is null)
+export async function getNonPlanPosts(): Promise<{ title: string; url: string }[]> {
+  try {
+    // Get all posts from the database where plan_id is null (not part of a plan)
+    const dbPosts = await db
+      .select({
+        postTitle: post.title,
+      })
+      .from(post)
+      .innerJoin(travel, eq(post.travelId, travel.id)) // Only posts with travel association
+      .where(
+        and(
+          sql`${post.planId} IS NULL`, // Exclude posts that are part of plans
+          eq(post.isPublished, 1) // Only published posts
+        )
+      )
+      .orderBy(desc(post.createdAt))
+      .all();
+
+    // Get all markdown posts to match with database posts
+    const markdownPosts = await getCollection('blog');
+
+    // Convert database posts to URLs
+    return dbPosts.map(dbPost => {
+      // Convert database title format to markdown filename format for matching
+      const normalizedTitle = dbPost.postTitle
+        .toLowerCase()
+        .replace(/_/g, '-')
+        .normalize('NFD') // Decompose accented characters
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
+        .replace(/[^a-z0-9-]/g, '-') // Replace non-alphanumeric chars with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+
+      // Find matching markdown post by comparing the slug (filename part)
+      const matchingMarkdown = markdownPosts.find(mdPost => {
+        const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
+        return slug === normalizedTitle;
+      });
+
+      // Use the full markdown path if found
+      const url = matchingMarkdown
+        ? `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
+        : `/blog/${normalizedTitle}`;
+
+      return {
+        title: dbPost.postTitle,
+        url
+      };
+    });
+  } catch (error) {
+    console.error('Error fetching non-plan posts:', error);
+    return [];
+  }
+}
