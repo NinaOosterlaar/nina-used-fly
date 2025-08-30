@@ -1,0 +1,138 @@
+---
+// No props needed for this component
+---
+
+<button 
+  id="scroll-to-top" 
+  class="scroll-to-top-btn" 
+  aria-label="Scroll to top"
+  title="Back to top"
+>
+  <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+    <path d="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+  </svg>
+</button>
+
+<style>
+  .scroll-to-top-btn {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f472b6, #ec4899);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 20px rgba(244, 114, 182, 0.3);
+    transition: all 0.3s ease;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px);
+    z-index: 1000;
+  }
+
+  .scroll-to-top-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .scroll-to-top-btn:hover {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(244, 114, 182, 0.4);
+  }
+
+  .scroll-to-top-btn:active {
+    transform: translateY(0);
+  }
+
+  .scroll-to-top-btn:focus {
+    outline: 2px solid #f472b6;
+    outline-offset: 3px;
+  }
+
+  /* Add a subtle pulse animation when first appearing */
+  .scroll-to-top-btn.visible {
+    animation: fadeInPulse 0.6s ease-out;
+  }
+
+  @keyframes fadeInPulse {
+    0% {
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+    }
+    50% {
+      transform: translateY(-5px) scale(1.05);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .scroll-to-top-btn {
+      width: 45px;
+      height: 45px;
+      bottom: 1.5rem;
+      right: 1.5rem;
+    }
+
+    .scroll-to-top-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  /* Ensure it doesn't interfere with other fixed elements */
+  @media (max-width: 480px) {
+    .scroll-to-top-btn {
+      bottom: 1rem;
+      right: 1rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    
+    if (!scrollToTopBtn) return;
+
+    // Show/hide button based on scroll position
+    function toggleScrollButton() {
+      if (!scrollToTopBtn) return;
+      
+      const scrollThreshold = 300; // Show button after scrolling 300px
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+      
+      if (scrollTop > scrollThreshold) {
+        scrollToTopBtn.classList.add('visible');
+      } else {
+        scrollToTopBtn.classList.remove('visible');
+      }
+    }
+
+    // Smooth scroll to top function
+    function scrollToTop() {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+
+    // Event listeners
+    window.addEventListener('scroll', toggleScrollButton);
+    scrollToTopBtn.addEventListener('click', scrollToTop);
+
+    // Initial check in case page is already scrolled
+    toggleScrollButton();
+  });
+</script>
