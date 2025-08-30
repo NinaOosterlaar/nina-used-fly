@@ -1,0 +1,130 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE } from '../consts';
+import { getAllTags, getEnrichedPostsForTag } from '../utils/blog-db';
+import { getTagDescription } from '../config/tags';
+import { url } from '../utils/url';
+import { resolveImageUrl } from '../utils/image';
+
+export async function getStaticPaths() {
+    // Get all tags from the database
+    const tags = await getAllTags();
+    
+    return tags.map((tagName) => ({
+        params: { tag: tagName.toLowerCase().replace(/ /g, '-') },
+        props: { tagName },
+    }));
+}
+
+const { tag } = Astro.params;
+const { tagName } = Astro.props;
+
+const tagPosts = await getEnrichedPostsForTag(tagName);
+---
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <BaseHead title={`${tagName} Posts - ${SITE_TITLE}`} description={getTagDescription(tagName)} />
+    </head>
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
+    <body>
+        <Header />
+        <main>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <!-- Page Header -->
+                <div class="text-center mb-12">
+                    <div class="flex justify-center items-center mb-6">
+                        <h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 leading-tight">
+                            #{tagName}
+                        </h1>
+                    </div>
+                    <p class="text-gray-600 max-w-4xl mx-auto md:text-xl">
+                        {getTagDescription(tagName)}
+                    </p>
+                    <p class="text-pink-500 font-medium mt-4">
+                        {tagPosts.length} post{tagPosts.length !== 1 ? 's' : ''} found
+                    </p>
+                </div>
+
+                <!-- Posts Grid -->
+                {tagPosts.length > 0 ? (
+                        <div class={`grid gap-8 ${tagPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : tagPosts.length === 2  ? "max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                            {tagPosts.map((postData) => (
+                            <a 
+                                href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
+                                class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
+                            >
+                                <div class={`overflow-hidden ${tagPosts.length <= 2 ? "h-80" : "h-48"}`}>
+                                    {postData.markdownData?.heroImage ? (
+                                        <img 
+                                            src={resolveImageUrl(postData.markdownData.heroImage)}
+                                            alt={postData.title}
+                                            class="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <img 
+                                            src="/default-hero-image.jpg" 
+                                            alt="Default Hero Image" 
+                                            class="w-full h-full object-cover"
+                                        />
+                                    )}
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-center text-sm text-pink-400 mb-2">
+										<i class="fas fa-map-marker-alt mr-1"></i>
+										<span>{postData.location}</span>
+										{postData.countryName && (
+											<>
+												<span class="mx-2">•</span>
+												<span>{postData.countryName}</span>
+											</>
+										)}
+										{postData.startDate && (
+											<>
+												<span class="mx-2">•</span>
+												<span>
+													{new Date(postData.startDate).toLocaleDateString('en-GB')}
+													{postData.endDate && (
+														<> - {new Date(postData.endDate).toLocaleDateString('en-GB')}</>
+													)}
+												</span>
+											</>
+										)}
+									</div>
+                                    <h3 class="title-font text-xl font-semibold text-gray-800 mb-3">{postData.title.replace(/_/g, ' ') || `Post ${postData.id}`}</h2>
+                                    <p class="text-gray-600 mb-4">{postData.markdownData?.description || 'Read about my experiences.'}</p>
+                                    <span class="text-pink-500 font-medium">Read more</span>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                ) : (
+                    <p class="text-center text-gray-500">No posts found for this tag.</p>
+                )}
+            </div>
+        </main>
+        <Footer />
+    </body>
+</html>
+
+<style>
+    .post-card {
+        transition: all 0.3s ease;
+    }
+    .post-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(244, 114, 182, 0.15);
+    }
+</style>
+```

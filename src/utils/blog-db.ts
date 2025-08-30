@@ -414,7 +414,98 @@ export async function getEnrichedPostsForPlan(planTitle: string): Promise<Enrich
   }
 }
 
-// Function to get number of enriched posts
+export async function getEnrichedPostsForTag(tagName: string): Promise<EnrichedBlogPost[]> {
+  try {
+    // Get all posts from the database for the specified tag with proper joins, ordered by start date
+    const dbPosts = await db
+      .select({
+        postId: post.id,
+        postTitle: post.title,
+        postStartDate: post.startDate,
+        postEndDate: post.endDate,
+        postCreatedAt: post.createdAt,
+        locationName: location.name,
+        countryName: country.name,
+      })
+      .from(post)
+      .innerJoin(location, eq(post.locationId, location.id))
+      .innerJoin(country, eq(location.countryId, country.id))
+      .innerJoin(postTags, eq(post.id, postTags.postId))
+      .innerJoin(tag, eq(postTags.tagId, tag.id))
+      .where(eq(tag.name, tagName))
+      .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
+      .all();
+
+    const enrichedPosts: EnrichedBlogPost[] = [];
+
+    // Get all markdown posts
+    const markdownPosts = await getCollection('blog');
+
+    for (const dbPost of dbPosts) {
+      // Convert database title format to markdown filename format
+      let dbTitleFormatted = dbPost.postTitle
+        .toLowerCase()
+        .replace(/_/g, '-')
+        .normalize('NFD') // Decompose accented characters
+        .replace(/[\u0300-\u036f]/g, '') // Remove diacritical marks
+        .replace(/[^a-z0-9-]/g, '-') // Replace non-alphanumeric chars with hyphens
+        .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
+        .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+
+      // Find matching markdown post
+      const matchingMarkdown = markdownPosts.find(mdPost => {
+        const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
+        return slug === dbTitleFormatted;
+      });
+
+      const enrichedPost: EnrichedBlogPost = {
+        id: dbPost.postId,
+        title: dbPost.postTitle,
+        startDate: dbPost.postStartDate,
+        endDate: dbPost.postEndDate,
+        createdAt: dbPost.postCreatedAt,
+        updatedAt: null,
+        tags: [tagName], // Include the tag we're filtering by
+        location: dbPost.locationName,
+        travelTitle: null,
+        planTitle: null,
+        countryName: dbPost.countryName,
+      };
+
+      if (matchingMarkdown) {
+        enrichedPost.markdownData = {
+          description: matchingMarkdown.data.description,
+          heroImage: matchingMarkdown.data.heroImage,
+          pubDate: matchingMarkdown.data.pubDate,
+          slug: matchingMarkdown.id,
+          url: `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
+        };
+      }
+
+      enrichedPosts.push(enrichedPost);
+    }
+
+    return enrichedPosts;
+  } catch (error) {
+    console.error('Error fetching enriched blog posts for tag:', error);
+    return [];
+  }
+}
+
+// Function to get all unique tags from the database
+export async function getAllTags(): Promise<string[]> {
+  try {
+    const tags = await db
+      .select({ name: tag.name })
+      .from(tag)
+      .orderBy(asc(tag.name));
+    
+    return tags.map(t => t.name);
+  } catch (error) {
+    console.error('Error fetching all tags:', error);
+    return [];
+  }
+}
 export async function getNumberOfEnrichedPosts(number: number): Promise<EnrichedBlogPost[]> {
   try {
     // Get the latest 'number' of posts from the database
@@ -625,5 +716,180 @@ export async function getNonPlanPosts(): Promise<{ title: string; url: string }[
   } catch (error) {
     console.error('Error fetching non-plan posts:', error);
     return [];
+  }
+}
+
+// Interface for navigation posts
+export interface NavigationPost {
+  title: string;
+  url: string;
+  description?: string;
+  heroImage?: string;
+  location?: string;
+}
+
+// Function to get next and previous posts for navigation
+export async function getNextPreviousPosts(title: string, folderPath?: string): Promise<{ next: NavigationPost | null; previous: NavigationPost | null }> {
+  try {
+    // First, try to find the current post using the existing logic
+    let currentPostMetadata = await getBlogPostByTitle(title, folderPath);
+    
+    // If not found, try some fallback strategies for known mismatches
+    if (!currentPostMetadata) {
+      console.log(`Could not find post with title: ${title}, trying fallback strategies`);
+      
+      // Handle specific known mismatches
+      const titleMappings: { [key: string]: string } = {
+        'Temple Stay Haeinsa': 'Temple_Stay',
+        'Ghent': 'Exploring_Ghent'
+      };
+      
+      if (titleMappings[title]) {
+        // Try to find the post directly by the mapped title
+        const mappedTitle = titleMappings[title];
+        const postResult = await db
+          .select({
+            id: post.id,
+            title: post.title,
+            startDate: post.startDate,
+            endDate: post.endDate,
+            createdAt: post.createdAt,
+            updatedAt: post.updatedAt,
+          })
+          .from(post)
+          .where(eq(post.title, mappedTitle))
+          .limit(1);
+
+        if (postResult.length > 0) {
+          currentPostMetadata = {
+            id: postResult[0].id,
+            title: postResult[0].title,
+            startDate: postResult[0].startDate,
+            endDate: postResult[0].endDate,
+            createdAt: postResult[0].createdAt,
+            updatedAt: postResult[0].updatedAt,
+            tags: [],
+            location: null,
+            travelTitle: null,
+            planTitle: null,
+          };
+        }
+      }
+    }
+    
+    if (!currentPostMetadata) {
+      console.log(`Still could not find current post with title: ${title}`);
+      return { next: null, previous: null };
+    }
+
+    // Now get the next and previous post IDs from the current post
+    const currentPostResult = await db
+      .select({
+        next: post.next,
+        previous: post.previous,
+      })
+      .from(post)
+      .where(eq(post.id, currentPostMetadata.id))
+      .limit(1);
+
+    if (currentPostResult.length === 0) {
+      return { next: null, previous: null };
+    }
+
+    const currentPost = currentPostResult[0];
+    let nextPost: NavigationPost | null = null;
+    let previousPost: NavigationPost | null = null;
+
+    // Get all markdown posts for URL matching
+    const markdownPosts = await getCollection('blog');
+
+    // Fetch next post if it exists
+    if (currentPost.next) {
+      const nextPostResult = await db
+        .select({
+          title: post.title,
+          locationName: location.name,
+        })
+        .from(post)
+        .leftJoin(location, eq(post.locationId, location.id))
+        .where(eq(post.id, currentPost.next))
+        .limit(1);
+
+      if (nextPostResult.length > 0) {
+        const nextPostTitle = nextPostResult[0].title;
+        const normalizedTitle = nextPostTitle
+          .toLowerCase()
+          .replace(/_/g, '-')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9-]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+
+        const matchingMarkdown = markdownPosts.find(mdPost => {
+          const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
+          return slug === normalizedTitle;
+        });
+
+        const url = matchingMarkdown
+          ? `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
+          : `/blog/${normalizedTitle}`;
+
+        nextPost = {
+          title: nextPostTitle.replace(/_/g, ' '),
+          url,
+          description: matchingMarkdown?.data?.description || '',
+          heroImage: matchingMarkdown?.data?.heroImage || '',
+          location: nextPostResult[0].locationName || ''
+        };
+      }
+    }
+
+    // Fetch previous post if it exists
+    if (currentPost.previous) {
+      const previousPostResult = await db
+        .select({
+          title: post.title,
+          locationName: location.name,
+        })
+        .from(post)
+        .leftJoin(location, eq(post.locationId, location.id))
+        .where(eq(post.id, currentPost.previous))
+        .limit(1);
+
+      if (previousPostResult.length > 0) {
+        const previousPostTitle = previousPostResult[0].title;
+        const normalizedTitle = previousPostTitle
+          .toLowerCase()
+          .replace(/_/g, '-')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9-]/g, '-')
+          .replace(/-+/g, '-')
+          .replace(/^-|-$/g, '');
+
+        const matchingMarkdown = markdownPosts.find(mdPost => {
+          const slug = mdPost.id.split('/').pop()?.replace(/\.(md|mdx)$/, '') || '';
+          return slug === normalizedTitle;
+        });
+
+        const url = matchingMarkdown
+          ? `/blog/${matchingMarkdown.id.replace(/\.(md|mdx)$/, '')}`
+          : `/blog/${normalizedTitle}`;
+
+        previousPost = {
+          title: previousPostTitle.replace(/_/g, ' '),
+          url,
+          description: matchingMarkdown?.data?.description || '',
+          heroImage: matchingMarkdown?.data?.heroImage || '',
+          location: previousPostResult[0].locationName || ''
+        };
+      }
+    }
+
+    return { next: nextPost, previous: previousPost };
+  } catch (error) {
+    console.error('Error fetching next/previous posts:', error);
+    return { next: null, previous: null };
   }
 }
