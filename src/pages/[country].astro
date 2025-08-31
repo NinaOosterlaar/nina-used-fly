@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import CountryMapSpecific from '../components/CountryMapSpecific.astro';
 import { SITE_TITLE } from '../consts';
 import { getCountryDescription, getCountryFlag, countryConfig } from '../config/countries';
 import { getEnrichedPostsForCountry } from '../utils/blog-db';
@@ -120,6 +121,9 @@ const countryPosts = await getEnrichedPostsForCountry(countryName);
 						</p>
 					</div>
 				)}
+
+				<!-- Country Map -->
+				<CountryMapSpecific countryName={countryName} />
 			</div>
 		</main>
 		<Footer />

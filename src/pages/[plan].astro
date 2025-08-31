@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import PlanMapSpecific from '../components/PlanMapSpecific.astro';
 import { SITE_TITLE } from '../consts';
 import { getPlanDescription, planConfig } from '../config/plans';
 import { getEnrichedPostsForPlan } from '../utils/blog-db';
@@ -99,6 +100,9 @@ const planPosts = await getEnrichedPostsForPlan(planName.replace(/ /g, '_'));
                 ) : (
                     <p class="text-center text-gray-500">No posts found for this plan.</p>
                 )}
+
+                <!-- Plan Map -->
+                <PlanMapSpecific planName={planName.replace(/ /g, '_')} />
             </div>
         </main>
         <Footer />
