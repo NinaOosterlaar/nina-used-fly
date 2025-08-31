@@ -426,6 +426,8 @@ export async function getEnrichedPostsForTag(tagName: string): Promise<EnrichedB
         postCreatedAt: post.createdAt,
         locationName: location.name,
         countryName: country.name,
+        travelId: post.travelId,
+        planId: post.planId,
       })
       .from(post)
       .innerJoin(location, eq(post.locationId, location.id))
@@ -442,6 +444,34 @@ export async function getEnrichedPostsForTag(tagName: string): Promise<EnrichedB
     const markdownPosts = await getCollection('blog');
 
     for (const dbPost of dbPosts) {
+      // Get travel information if travelId exists
+      let travelTitle: string | null = null;
+      if (dbPost.travelId) {
+        const travelResult = await db
+          .select({ title: travel.title })
+          .from(travel)
+          .where(eq(travel.id, dbPost.travelId))
+          .limit(1);
+
+        if (travelResult.length > 0) {
+          travelTitle = travelResult[0].title;
+        }
+      }
+
+      // Get plan information if planId exists
+      let planTitle: string | null = null;
+      if (dbPost.planId) {
+        const planResult = await db
+          .select({ title: plans.title })
+          .from(plans)
+          .where(eq(plans.id, dbPost.planId))
+          .limit(1);
+
+        if (planResult.length > 0) {
+          planTitle = planResult[0].title;
+        }
+      }
+
       // Convert database title format to markdown filename format
       let dbTitleFormatted = dbPost.postTitle
         .toLowerCase()
@@ -467,8 +497,8 @@ export async function getEnrichedPostsForTag(tagName: string): Promise<EnrichedB
         updatedAt: null,
         tags: [tagName], // Include the tag we're filtering by
         location: dbPost.locationName,
-        travelTitle: null,
-        planTitle: null,
+        travelTitle: travelTitle,
+        planTitle: planTitle,
         countryName: dbPost.countryName,
       };
 

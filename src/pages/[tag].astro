@@ -22,6 +22,11 @@ const { tag } = Astro.params;
 const { tagName } = Astro.props;
 
 const tagPosts = await getEnrichedPostsForTag(tagName);
+
+// Group posts by type
+const travelPosts = tagPosts.filter(post => post.travelTitle);
+const planPosts = tagPosts.filter(post => post.planTitle);
+const otherPosts = tagPosts.filter(post => !post.travelTitle && !post.planTitle);
 ---
 
 <!DOCTYPE html>
@@ -57,57 +62,180 @@ const tagPosts = await getEnrichedPostsForTag(tagName);
                     </p>
                 </div>
 
-                <!-- Posts Grid -->
+                <!-- Posts organized by category -->
                 {tagPosts.length > 0 ? (
-                        <div class={`grid gap-8 ${tagPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : tagPosts.length === 2  ? "max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
-                            {tagPosts.map((postData) => (
-                            <a 
-                                href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
-                                class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
-                            >
-                                <div class={`overflow-hidden ${tagPosts.length <= 2 ? "h-80" : "h-48"}`}>
-                                    {postData.markdownData?.heroImage ? (
-                                        <img 
-                                            src={resolveImageUrl(postData.markdownData.heroImage)}
-                                            alt={postData.title}
-                                            class="w-full h-full object-cover"
-                                        />
-                                    ) : (
-                                        <img 
-                                            src="/default-hero-image.jpg" 
-                                            alt="Default Hero Image" 
-                                            class="w-full h-full object-cover"
-                                        />
-                                    )}
+                    <div class="space-y-12">
+                        <!-- Travel Posts Section -->
+                        {travelPosts.length > 0 && (
+                            <section>
+                                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                    <i class="fas fa-car text-pink-500 mr-3"></i>
+                                    Travel Posts
+                                    <span class="ml-3 text-lg text-pink-500 font-normal">({travelPosts.length})</span>
+                                </h2>
+                                <div class={`grid gap-6 ${travelPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : travelPosts.length === 2 ? "max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                                    {travelPosts.map((postData) => (
+                                    <a 
+                                        href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
+                                        class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
+                                    >
+                                        <div class={`overflow-hidden ${travelPosts.length <= 2 ? "h-80" : "h-48"}`}>
+                                            {postData.markdownData?.heroImage ? (
+                                                <img 
+                                                    src={resolveImageUrl(postData.markdownData.heroImage)}
+                                                    alt={postData.title}
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <img 
+                                                    src="/default-hero-image.jpg" 
+                                                    alt="Default Hero Image" 
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            )}
+                                        </div>
+                                        <div class="p-6">
+                                            <div class="flex items-center text-sm text-pink-400 mb-2">
+                                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                                <span>{postData.location}</span>
+                                                {postData.countryName && (
+                                                    <>
+                                                        <span class="mx-2">•</span>
+                                                        <span>{postData.countryName}</span>
+                                                    </>
+                                                )}
+                                                {postData.startDate && (
+                                                    <>
+                                                        <span class="mx-2">•</span>
+                                                        <span>
+                                                            {new Date(postData.startDate).toLocaleDateString('en-GB')}
+                                                            {postData.endDate && (
+                                                                <> - {new Date(postData.endDate).toLocaleDateString('en-GB')}</>
+                                                            )}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <h3 class="title-font text-xl font-semibold text-gray-800 mb-3">{postData.title.replace(/_/g, ' ') || `Post ${postData.id}`}</h2>
+                                            <p class="text-gray-600 mb-4">{postData.markdownData?.description || 'Read about my experiences.'}</p>
+                                            <span class="text-pink-500 font-medium">Read more</span>
+                                        </div>
+                                    </a>
+                                    ))}
                                 </div>
-                                <div class="p-6">
-                                    <div class="flex items-center text-sm text-pink-400 mb-2">
-										<i class="fas fa-map-marker-alt mr-1"></i>
-										<span>{postData.location}</span>
-										{postData.countryName && (
-											<>
-												<span class="mx-2">•</span>
-												<span>{postData.countryName}</span>
-											</>
-										)}
-										{postData.startDate && (
-											<>
-												<span class="mx-2">•</span>
-												<span>
-													{new Date(postData.startDate).toLocaleDateString('en-GB')}
-													{postData.endDate && (
-														<> - {new Date(postData.endDate).toLocaleDateString('en-GB')}</>
-													)}
-												</span>
-											</>
-										)}
-									</div>
-                                    <h3 class="title-font text-xl font-semibold text-gray-800 mb-3">{postData.title.replace(/_/g, ' ') || `Post ${postData.id}`}</h2>
-                                    <p class="text-gray-600 mb-4">{postData.markdownData?.description || 'Read about my experiences.'}</p>
-                                    <span class="text-pink-500 font-medium">Read more</span>
+                            </section>
+                        )}
+
+                        <!-- Plan Posts Section -->
+                        {planPosts.length > 0 && (
+                            <section>
+                                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                    <i class="fas fa-calendar text-pink-500 mr-3"></i>
+                                    Plan Posts
+                                    <span class="ml-3 text-lg text-pink-500 font-normal">({planPosts.length})</span>
+                                </h2>
+                                <div class={`grid gap-6 ${planPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : planPosts.length === 2 ? "max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                                    {planPosts.map((postData) => (
+                                    <a 
+                                        href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
+                                        class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
+                                    >
+                                        <div class={`overflow-hidden ${planPosts.length <= 2 ? "h-80" : "h-48"}`}>
+                                            {postData.markdownData?.heroImage ? (
+                                                <img 
+                                                    src={resolveImageUrl(postData.markdownData.heroImage)}
+                                                    alt={postData.title}
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <img 
+                                                    src="/default-hero-image.jpg" 
+                                                    alt="Default Hero Image" 
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            )}
+                                        </div>
+                                        <div class="p-6">
+                                            <div class="flex items-center text-sm text-pink-400 mb-2">
+                                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                                <span>{postData.location}</span>
+                                                {postData.countryName && (
+                                                    <>
+                                                        <span class="mx-2">•</span>
+                                                        <span>{postData.countryName}</span>
+                                                    </>
+                                                )}
+                                                {postData.startDate && (
+                                                    <>
+                                                        <span class="mx-2">•</span>
+                                                        <span>
+                                                            {new Date(postData.startDate).toLocaleDateString('en-GB')}
+                                                            {postData.endDate && (
+                                                                <> - {new Date(postData.endDate).toLocaleDateString('en-GB')}</>
+                                                            )}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <h3 class="title-font text-xl font-semibold text-gray-800 mb-3">{postData.title.replace(/_/g, ' ') || `Post ${postData.id}`}</h2>
+                                            <p class="text-gray-600 mb-4">{postData.markdownData?.description || 'Read about my experiences.'}</p>
+                                            <span class="text-pink-500 font-medium">Read more</span>
+                                        </div>
+                                    </a>
+                                    ))}
                                 </div>
-                            </a>
-                        ))}
+                            </section>
+                        )}
+
+                        <!-- Other Posts Section -->
+                        {otherPosts.length > 0 && (
+                            <section>
+                                <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                                    <i class="fas fa-file-alt text-pink-500 mr-3"></i>
+                                    Other Posts
+                                    <span class="ml-3 text-lg text-pink-500 font-normal">({otherPosts.length})</span>
+                                </h2>
+                                <div class={`grid gap-6 ${otherPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : otherPosts.length === 2 ? "max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                                    {otherPosts.map((postData) => (
+                                    <a 
+                                        href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
+                                        class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
+                                    >
+                                        <div class={`overflow-hidden ${otherPosts.length <= 2 ? "h-80" : "h-48"}`}>
+                                            {postData.markdownData?.heroImage ? (
+                                                <img 
+                                                    src={resolveImageUrl(postData.markdownData.heroImage)}
+                                                    alt={postData.title}
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            ) : (
+                                                <img 
+                                                    src="/default-hero-image.jpg" 
+                                                    alt="Default Hero Image" 
+                                                    class="w-full h-full object-cover"
+                                                />
+                                            )}
+                                        </div>
+                                        <div class="p-6">
+                                            <div class="flex items-center text-sm text-pink-400 mb-2">
+                                                <i class="fas fa-map-marker-alt mr-1"></i>
+                                                <span>{postData.location}</span>
+                                                {postData.countryName && (
+                                                    <>
+                                                        <span class="mx-2">•</span>
+                                                        <span>{postData.countryName}</span>
+                                                    </>
+                                                )}
+                                            </div>
+                                            <h3 class="title-font text-xl font-semibold text-gray-800 mb-3">{postData.title.replace(/_/g, ' ') || `Post ${postData.id}`}</h2>
+                                            <p class="text-gray-600 mb-4">{postData.markdownData?.description || 'Read about my experiences.'}</p>
+                                            <span class="text-pink-500 font-medium">Read more</span>
+                                        </div>
+                                    </a>
+                                    ))}
+                                </div>
+                            </section>
+                        )}
                     </div>
                 ) : (
                     <p class="text-center text-gray-500">No posts found for this tag.</p>
@@ -125,6 +253,15 @@ const tagPosts = await getEnrichedPostsForTag(tagName);
     .post-card:hover {
         transform: translateY(-4px);
         box-shadow: 0 20px 40px rgba(244, 114, 182, 0.15);
+    }
+    .travel-link {
+        color: #f472b6;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+    .travel-link:hover {
+        color: #ec4899;
     }
 </style>
 ```

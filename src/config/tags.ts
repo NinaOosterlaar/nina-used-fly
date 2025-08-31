@@ -79,6 +79,9 @@ export const tagConfig: Record<string, {
   },
   'Wildlife': {
     description: 'Animal encounters and wildlife observation experiences.'
+  },
+  'Religion': {
+    description: 'Exploring beliefs, practices, and spiritual experiences.'
   }
 };
 
