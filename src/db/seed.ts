@@ -155,7 +155,9 @@ const seedData = {
             startDate: '2025-06-13',
             endDate: '2025-06-15',
             createdAt: new Date().toISOString(),
-            isPublished: 0
+            isPublished: 0,
+            previous: null,
+            next: null
         },
         {
             title: 'Ed_Sheeran_Antwerp',
@@ -163,7 +165,9 @@ const seedData = {
             travel: 'Musical_Trip_to_Belgium',
             startDate: '2025-08-07',
             createdAt: new Date().toISOString(),
-            isPublished: 0
+            isPublished: 0,
+            previous: null,
+            next: null
         },
         {
             title: 'Vibing_in_Bruges',
@@ -172,7 +176,9 @@ const seedData = {
             startDate: '2025-08-08',
             endDate: '2025-08-10',
             createdAt: new Date().toISOString(),
-            isPublished: 0
+            isPublished: 0,
+            previous: null,
+            next: null
         },
         {
             title: 'Exploring_Ghent',
@@ -180,7 +186,9 @@ const seedData = {
             travel: 'Musical_Trip_to_Belgium',
             startDate: '2025-08-10',
             createdAt: new Date().toISOString(),
-            isPublished: 0
+            isPublished: 0,
+            previous: null,
+            next: null
         },
     ],
 
