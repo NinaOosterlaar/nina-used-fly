@@ -5,7 +5,7 @@ export const planConfig: Record<string, {
 }> = {
     'Three Weeks South Korea': {
         description: 'A comprehensive 3-week itinerary exploring the highlights of South Korea in the fall.',
-        heroImage: 'plans/Plans_covers/Flag_of_South_Korea.png'
+        heroImage: '/plans/Plans_covers/Flag_of_South_Korea.png'
     }
 };
 
