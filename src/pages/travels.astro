@@ -20,7 +20,7 @@ const travelWithPosts = await db.select({
 	})
 	.from(travel)
 	.innerJoin(post, eq(post.travelId, travel.id))
-	.groupBy(travel.id, travel.title, travel.startDate, travel	.endDate)
+	.groupBy(travel.id, travel.title, travel.startDate, travel.endDate)
 	.orderBy(sql`MAX(${post.startDate}) DESC`) // Order by most recent post date
 	.all();
 // console.log('Travel with posts:', travelWithPosts);
@@ -54,12 +54,12 @@ const defaultImage = fidoughImage.src;
 						Travels
 					</h1>
 					<p class="text-gray-600 max-w-3xl mx-auto md:text-xl">
-						This page is dedicated to my individual travels. They are grouped together to show a consecutive journey I took. 
+						This page is dedicated to my individual travels. 
+						They are grouped together to show a consecutive journey I took or to create collections of different trips.
 						They range from a collection of day trips in The Netherlands to longer trips abroad to multiple destinations.
 					</p>
 				</div>
 
-				<!-- Work in Progress Section -->
 				{travelWithPosts.length > 0 ? (
 					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-stretch">
 						{travelWithPosts.map((travelData) => (

@@ -5,7 +5,7 @@ import Footer from "../components/Footer.astro";
 import TravelMap from "../components/TravelMap.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { getCollection } from 'astro:content';
-import { getNumberOfEnrichedPosts } from '../utils/blog-db';
+import { getNumberOfEnrichedPosts, getNonPlanPosts } from '../utils/blog-db';
 import { url } from "../utils/url";
 import { resolveImageUrl } from "../utils/image";
 
@@ -15,8 +15,9 @@ const allPosts = await getCollection('blog');
 // Get the 3 most recent posts sorted by publication date
 const recentPosts = await getNumberOfEnrichedPosts(3);
 
-// Prepare all post URLs for client-side random selection
-const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx)$/, '')}`));
+// Get all non-plan post URLs for client-side random selection
+const nonPlanPosts = await getNonPlanPosts();
+const randomPostUrls = nonPlanPosts.map(post => url(post.url));
 ---
 
 <!doctype html>
@@ -128,7 +129,7 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 										{post.title.replace(/_/g, ' ')}
 									</h3>
 									<p class="text-gray-600 mb-4">
-										{post.markdownData?.description || 'Read about my experiences and discoveries in this beautiful location in Belgium.'}
+										{post.markdownData?.description || 'Read about my experiences and discoveries in this beautiful location.'}
 									</p>
 									<div class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200">
 										Read more
@@ -235,14 +236,14 @@ const allPostUrls = allPosts.map(post => url(`/blog/${post.id.replace(/\.(md|mdx
 
 		</script>
 
-		<script is:inline define:vars={{ allPostUrls }}>
+		<script is:inline define:vars={{ randomPostUrls }}>
 			// Random post functionality
 			document.addEventListener('DOMContentLoaded', () => {
 				const randomBtn = document.getElementById('randomPostBtn');
-				if (randomBtn && allPostUrls.length > 0) {
+				if (randomBtn && randomPostUrls.length > 0) {
 					randomBtn.addEventListener('click', () => {
-						const randomIndex = Math.floor(Math.random() * allPostUrls.length);
-						const randomUrl = allPostUrls[randomIndex];
+						const randomIndex = Math.floor(Math.random() * randomPostUrls.length);
+						const randomUrl = randomPostUrls[randomIndex];
 						window.location.href = randomUrl;
 					});
 				}

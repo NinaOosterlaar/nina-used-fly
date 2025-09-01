@@ -1,0 +1,110 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import PlanMapSpecific from '../components/PlanMapSpecific.astro';
+import { SITE_TITLE } from '../consts';
+import { getPlanDescription, planConfig } from '../config/plans';
+import { getEnrichedPostsForPlan } from '../utils/blog-db';
+import { url } from '../utils/url';
+import { resolveImageUrl } from '../utils/image';
+
+export async function getStaticPaths() {
+    // Get all plans from the config
+    const plans = Object.keys(planConfig);
+    
+    return plans.map((planName) => ({
+        params: { plan: planName.toLowerCase().replace(/ /g, '_') },
+        props: { planName },
+    }));
+}
+
+const { plan } = Astro.params;
+const { planName } = Astro.props;
+
+const planPosts = await getEnrichedPostsForPlan(planName.replace(/ /g, '_'));
+
+---
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <BaseHead title={`${planName} - ${SITE_TITLE}`} description={`My destinations and adventures during ${planName}`} />
+    </head>
+    <!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
+    <body>
+        <Header />
+        <main>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <!-- Page Header -->
+                <div class="text-center mb-12">
+                    <h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
+                        {planName}
+                    </h1>
+                    <p class="text-gray-600 max-w-4xl mx-auto md:text-xl">
+                        {getPlanDescription(planName)}
+                    </p>
+                </div>
+
+                <!-- Posts Grid -->
+                {planPosts.length > 0 ? (
+                        <div class={`grid gap-8 ${planPosts.length === 1 ? "max-w-xl mx-auto grid-cols-1" : planPosts.length === 2  ? "max-w-4xl mx-auto grid-cols-1 sm:grid-cols-2" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"}`}>
+                            {planPosts.map((postData) => (
+                            <a 
+                                href={url(postData.markdownData?.url || `/blog/post-${postData.id}`)}
+                                class="post-card bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 block"
+                            >
+                                <div class={`overflow-hidden ${planPosts.length <= 2 ? "h-80" : "h-48"}`}>
+                                    {postData.markdownData?.heroImage ? (
+                                        <img 
+                                            src={resolveImageUrl(postData.markdownData.heroImage)}
+                                            alt={postData.title}
+                                            class="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <img 
+                                            src="/default-hero-image.jpg" 
+                                            alt="Default Hero Image" 
+                                            class="w-full h-full object-cover"
+                                        />
+                                    )}
+                                </div>
+                                <div class="p-6">
+                                    <div class="flex items-center text-sm text-pink-400 mb-2">
+										<i class="fas fa-map-marker-alt mr-1"></i>
+										<span>{postData.location}</span>
+										{postData.createdAt && (
+											<>
+												<span class="mx-2">•</span>
+												<span>
+													{new Date(postData.createdAt).toLocaleDateString('en-GB')}
+												</span>
+											</>
+										)}
+									</div>
+                                    <h3 class="title-font text-xl font-semibold text-gray-800 mb-3">{postData.title.replace(/_/g, ' ') || `Post ${postData.id}`}</h2>
+                                    <p class="text-gray-600 mb-4">{postData.markdownData?.description || 'Read about my experiences.'}</p>
+                                    <span class="text-pink-500 font-medium">Read more</span>
+                                </div>
+                            </a>
+                        ))}
+                    </div>
+                ) : (
+                    <p class="text-center text-gray-500">No posts found for this plan.</p>
+                )}
+
+                <!-- Plan Map -->
+                <PlanMapSpecific planName={planName.replace(/ /g, '_')} />
+            </div>
+        </main>
+        <Footer />
+    </body>
+</html>

@@ -11,8 +11,8 @@ export const travelConfig: Record<string, {
     description: "Going to Belgium for an Ed Sheeran concert. After the concert, we explored Bruges and Ghent, two beautiful cities.",
     heroImage: '/Travels_covers/castle.jpg'
     },
-    'Pokémon in Paris': {
-    description: "A trip to Paris with the main goal of catching Pokémon, since Go Fest 2025 took place in Paris. We visited the city, but also played a lot of Pokémon GO.",
+    'City Trips': {
+    description: "This page is dedicated to my city trips. They do not cover a consecutive journey I took, but this is more of a collection of different cities I visited for a day or a few days.",
     heroImage: '/Travels_covers/Sebas_paris.jpg'
     },
 };
@@ -41,8 +41,4 @@ export function getTravelDescription(travelName: string): string {
 
 export function getTravelHeroImage(travelName: string, fallbackImage?: string): string {
   return travelConfig[travelName]?.heroImage || fallbackImage || '/assets/fidough.png';
-}
-
-export function getTravelFlag(travelName: string): string {
-  return travelConfig[travelName]?.flag || '🌍';
 }

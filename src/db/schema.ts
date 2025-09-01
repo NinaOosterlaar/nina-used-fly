@@ -76,6 +76,8 @@ export const post = sqliteTable('posts', {
     createdAt: text('created_at').notNull(),
     updatedAt: text('updated_at'),
     isPublished: integer('is_published').notNull().default(0), // 0 for false, 1 for true
+    previous: integer('previous').references(() => post.id, { onDelete: 'set null' }),
+    next: integer('next').references(() => post.id, { onDelete: 'set null' })
 });
 
 export const tag = sqliteTable('tags', {

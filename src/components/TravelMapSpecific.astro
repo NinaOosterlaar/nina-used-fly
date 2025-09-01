@@ -1,0 +1,359 @@
+---
+import { getPostsWithCoordinatesForTravel } from '../utils/blog-db';
+import { url } from '../utils/url';
+
+export interface Props {
+  travelName: string;
+}
+
+const { travelName } = Astro.props;
+
+// Get posts with coordinates for this specific travel
+const postsWithCoords = await getPostsWithCoordinatesForTravel(travelName);
+console.log(`Posts with coordinates for travel ${travelName}:`, postsWithCoords);
+
+// Filter out posts without coordinates and transform to expected format
+const posts = postsWithCoords
+  .filter(post => post.latitude && post.longitude)
+  .map(post => ({
+    id: post.id,
+    title: post.title,
+    postUrl: url(post.url), // Use the url utility function
+    tags: post.tags,
+    description: post.description,
+    location: {
+      name: post.locationName,
+      country: post.countryName,
+      lat: parseFloat(post.latitude!),
+      lng: parseFloat(post.longitude!)
+    }
+  }));
+
+console.log('Transformed posts for travel map:', posts);
+---
+
+{posts.length > 0 && (
+  <div class="travel-map-container">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div class="text-center mb-8">
+        <h2 class="title-font text-3xl font-semibold text-pink-400 mb-2">
+          Journey Map
+        </h2>
+        <p class="text-gray-500 max-w-2xl mx-auto">
+          Explore the locations I visited during {travelName.replace(/_/g, ' ')}
+        </p>
+      </div>
+      <div id="travel-specific-map" class="h-96 lg:h-[500px] rounded-2xl shadow-lg overflow-hidden border-0 bg-gradient-to-br from-pink-50 to-purple-50"></div>
+    </div>
+  </div>
+)}
+
+<!-- Leaflet CSS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script is:inline define:vars={{ posts }}>
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    
+    // Check if Leaflet is loaded and we have posts
+    if (typeof L === 'undefined' || !posts || posts.length === 0) {
+      return;
+    }
+    
+    // Initialize the map
+    try {
+      const map = L.map('travel-specific-map', {
+        scrollWheelZoom: false, // Disable scroll wheel zoom by default
+        minZoom: 2, // Prevent zooming out beyond one world map
+        maxZoom: 18, // Set reasonable maximum zoom
+        maxBounds: [[-90, -180], [90, 180]], // Restrict panning to one world
+        maxBoundsViscosity: 1.0 // Make the bounds "sticky" - prevents dragging outside
+      });
+      
+      // Enhanced scroll control - only enable when map is clicked and focused
+      const mapContainer = document.getElementById('travel-specific-map');
+      let mapIsActive = false;
+      
+      if (mapContainer) {
+        // Enable scroll when user clicks on the map
+        mapContainer.addEventListener('click', (e) => {
+          e.stopPropagation(); // Prevent event bubbling
+          mapIsActive = true;
+          map.scrollWheelZoom.enable();
+        });
+        
+        // Disable scroll when user clicks outside the map
+        document.addEventListener('click', (e) => {
+          if (!mapContainer.contains(e.target)) {
+            mapIsActive = false;
+            map.scrollWheelZoom.disable();
+          }
+        });
+        
+        // Disable scroll when mouse leaves the map area
+        mapContainer.addEventListener('mouseleave', () => {
+          if (mapIsActive) {
+            mapIsActive = false;
+            map.scrollWheelZoom.disable();
+          }
+        });
+        
+        // For touch devices - enable on touch start, disable on touch end outside
+        let touchStarted = false;
+        
+        mapContainer.addEventListener('touchstart', (e) => {
+          e.stopPropagation();
+          touchStarted = true;
+          mapIsActive = true;
+          map.scrollWheelZoom.enable();
+        });
+        
+        // Disable on touch outside the map
+        document.addEventListener('touchstart', (e) => {
+          if (!mapContainer.contains(e.target) && touchStarted) {
+            mapIsActive = false;
+            map.scrollWheelZoom.disable();
+            touchStarted = false;
+          }
+        });
+        
+        // Also disable scroll on escape key for accessibility
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && mapIsActive) {
+            mapIsActive = false;
+            map.scrollWheelZoom.disable();
+          }
+        });
+      }
+      
+      // Add tile layer
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+      }).addTo(map);
+      
+      // Create custom pink marker icon
+      const pinkIcon = L.divIcon({
+        className: 'custom-pink-marker',
+        html: '<div class="marker-pin"></div>',
+        iconSize: [20, 20],
+        iconAnchor: [10, 10]
+      });
+      
+      // Array to store markers for bounds fitting
+      const markers = [];
+      
+      // Add markers for each post
+      let markerCount = 0;
+      
+      posts.forEach(post => {
+        const marker = L.marker([post.location.lat, post.location.lng], { icon: pinkIcon }).addTo(map);
+        
+        // Create popup content
+        const tagsHtml = post.tags.length > 0 
+          ? `<div class="popup-tags">${post.tags.map(tag => `<span class="popup-tag">${tag}</span>`).join('')}</div>` 
+          : '';
+        
+        const popupContent = `
+          <div class="compact-popup">
+            <h3 class="popup-title">${post.title.replace(/_/g, ' ')}</h3>
+            <p class="popup-location">📍 ${post.location.name}, ${post.location.country}</p>
+            ${tagsHtml}
+            <p class="popup-description">${post.description}</p>
+            <a href="${post.postUrl}" class="popup-link">Read Story →</a>
+          </div>
+        `;
+        
+        marker.bindPopup(popupContent);
+        markers.push(marker);
+        markerCount++;
+      });
+      
+    
+      // Fit map to show all markers with appropriate zoom
+      if (markers.length > 0) {
+        const group = new L.featureGroup(markers);
+        const bounds = group.getBounds();
+        
+        // If we only have one marker, set a reasonable zoom level
+        if (markers.length === 1) {
+          map.setView([posts[0].location.lat, posts[0].location.lng], 10);
+        } else {
+          map.fitBounds(bounds.pad(0.1));
+        }
+      }
+      
+    } catch (error) {
+      console.error('Error initializing travel map:', error);
+    }
+  });
+</script>
+
+<style>
+  .travel-map-container {
+    position: relative;
+    width: 100%;
+    background: transparent;
+    z-index: 10;
+    margin-top: 2rem;
+  }
+
+  /* Custom pink marker styling */
+  :global(.custom-pink-marker) {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  :global(.marker-pin) {
+    width: 20px;
+    height: 20px;
+    background: #f472b6;
+    border: 3px solid #fff;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(244, 114, 182, 0.3);
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  :global(.marker-pin:hover) {
+    background: #ec4899;
+    transform: scale(1.2);
+    box-shadow: 0 4px 16px rgba(244, 114, 182, 0.5);
+  }
+
+  /* Popup styling - moderately compact layout */
+  :global(.compact-popup) {
+    padding: 8px !important;
+    margin: 0 !important;
+    min-width: 200px;
+    max-width: 240px;
+    font-size: 12px;
+    line-height: 1.3;
+  }
+
+  :global(.popup-title) {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #f472b6 !important;
+    margin: 0 0 4px 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+    font-family: inherit;
+  }
+
+  :global(.popup-location) {
+    font-size: 11px !important;
+    color: #6b7280 !important;
+    margin: 0 0 4px 0 !important;
+    padding: 0 !important;
+    line-height: 1.2 !important;
+  }
+
+  :global(.popup-tags) {
+    margin: 0 0 4px 0 !important;
+    padding: 0 !important;
+    line-height: 1.1 !important;
+  }
+
+  :global(.popup-tag) {
+    display: inline-block;
+    background: #fce7f3 !important;
+    color: #be185d !important;
+    font-size: 9px !important;
+    padding: 2px 5px !important;
+    margin: 0 3px 2px 0 !important;
+    border-radius: 4px !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+  }
+
+  :global(.popup-description) {
+    font-size: 11px !important;
+    color: #4b5563 !important;
+    margin: 0 0 8px 0 !important;
+    padding: 0 !important;
+    line-height: 1.3 !important;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  :global(.popup-link) {
+    display: inline-block !important;
+    padding: 4px 10px !important;
+    background: #f472b6 !important;
+    color: white !important;
+    text-decoration: none !important;
+    border-radius: 12px !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    transition: all 0.2s ease !important;
+    margin: 0 !important;
+  }
+
+  :global(.popup-link:hover) {
+    background: #ec4899 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 4px 8px rgba(244, 114, 182, 0.3) !important;
+  }
+
+  /* Override default Leaflet popup styling for compactness */
+  :global(.leaflet-popup-content-wrapper) {
+    border-radius: 8px !important;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.15) !important;
+    border: 1px solid #fce7f3 !important;
+    padding: 0 !important;
+  }
+
+  :global(.leaflet-popup-content) {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: auto !important;
+    min-height: auto !important;
+  }
+
+  :global(.leaflet-popup-tip) {
+    border-top-color: #fce7f3 !important;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    #travel-specific-map {
+      height: 300px;
+    }
+    
+    :global(.compact-popup) {
+      min-width: 180px !important;
+      max-width: 200px !important;
+      font-size: 11px !important;
+      padding: 7px !important;
+    }
+    
+    :global(.popup-title) {
+      font-size: 13px !important;
+    }
+    
+    :global(.popup-location) {
+      font-size: 10px !important;
+    }
+
+    :global(.popup-tag) {
+      font-size: 8px !important;
+      padding: 2px 4px !important;
+    }
+
+    :global(.popup-description) {
+      font-size: 10px !important;
+    }
+    
+    :global(.popup-link) {
+      padding: 4px 8px !important;
+      font-size: 10px !important;
+    }
+  }
+</style>

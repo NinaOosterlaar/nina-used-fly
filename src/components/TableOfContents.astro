@@ -1,0 +1,351 @@
+---
+export interface Props {
+  headings: { depth: number; slug: string; text: string }[];
+}
+
+const { headings } = Astro.props;
+
+// Include all headings from h1 to h4
+const tocHeadings = headings.filter(heading => heading.depth >= 1 && heading.depth <= 4);
+---
+
+{tocHeadings.length > 0 && (
+  <nav class="table-of-contents">
+    <button class="toc-toggle" type="button" aria-expanded="false">
+      <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M3,9H17V7H3V9M3,13H17V11H3V13M3,17H17V15H3V17M19,17H21V15H19V17M19,7V9H21V7H19M19,11H21V13H19V11Z" />
+      </svg>
+      <span class="toc-title-text">Table of Contents</span>
+      <svg class="toc-chevron" width="16" height="16" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+      </svg>
+    </button>
+    <div class="toc-content">
+      <ul class="toc-list">
+        {tocHeadings.map((heading) => (
+          <li class={`toc-item toc-level-${heading.depth}`}>
+            <a href={`#${heading.slug}`} class="toc-link">
+              <span class="toc-bullet"></span>
+              <span class="toc-text">{heading.text}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </nav>
+)}
+
+<style>
+  .table-of-contents {
+    background: linear-gradient(135deg, #fdf2f8 0%, #fff9fb 50%, #fef7f0 100%);
+    border: 2px solid #fce7f3;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+    box-shadow: 0 4px 20px rgba(244, 114, 182, 0.08);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s ease;
+  }
+
+  .table-of-contents:hover {
+    box-shadow: 0 6px 25px rgba(244, 114, 182, 0.12);
+  }
+
+  .table-of-contents::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, #f472b6, #ec4899, #f472b6);
+  }
+
+  .toc-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #f472b6;
+    margin: 0;
+    padding: 0 0 0.75rem 0;
+    border-bottom: 2px solid #fce7f3;
+    transition: all 0.2s ease;
+  }
+
+  .toc-toggle:hover {
+    color: #ec4899;
+  }
+
+  .toc-toggle:focus {
+    outline: 2px solid #f472b6;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  .toc-title-text {
+    flex: 1;
+    text-align: left;
+  }
+
+  .toc-chevron {
+    color: #f472b6;
+    transition: transform 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .table-of-contents[data-expanded="true"] .toc-chevron {
+    transform: rotate(180deg);
+  }
+
+  .table-of-contents[data-expanded="false"] {
+    padding-bottom: 1.5rem;
+  }
+
+  .table-of-contents[data-expanded="false"]::after {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 1rem;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    font-style: italic;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+  }
+
+  .table-of-contents[data-expanded="false"]:hover::after {
+    opacity: 1;
+  }
+
+  .toc-content {
+    overflow: hidden;
+    transition: max-height 0.3s ease, opacity 0.2s ease;
+    max-height: 0;
+    opacity: 0;
+  }
+
+  .table-of-contents[data-expanded="true"] .toc-content {
+    max-height: 60vh; /* Use viewport height instead of fixed pixels */
+    opacity: 1;
+    padding-top: 1.25rem;
+    overflow-y: auto; /* Make it scrollable */
+    position: relative;
+  }
+
+  /* Gradient fade effect at bottom when scrollable */
+  .table-of-contents[data-expanded="true"] .toc-content::after {
+    content: '';
+    position: sticky;
+    bottom: 0;
+    height: 20px;
+    background: linear-gradient(to bottom, transparent, rgba(253, 242, 248, 0.8));
+    pointer-events: none;
+    margin-top: -20px;
+  }
+
+  /* Custom scrollbar styling */
+  .toc-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .toc-content::-webkit-scrollbar-track {
+    background: rgba(244, 114, 182, 0.1);
+    border-radius: 3px;
+  }
+
+  .toc-content::-webkit-scrollbar-thumb {
+    background: rgba(244, 114, 182, 0.3);
+    border-radius: 3px;
+  }
+
+  .toc-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(244, 114, 182, 0.5);
+  }
+
+  .toc-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .toc-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    color: #6b7280;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    position: relative;
+  }
+
+  .toc-link:hover {
+    color: #f472b6;
+    background: rgba(244, 114, 182, 0.05);
+    transform: translateX(4px);
+    border-bottom: none;
+  }
+
+  .toc-link:hover::before {
+    width: 0;
+  }
+
+  .toc-bullet {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #f472b6;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
+  }
+
+  .toc-link:hover .toc-bullet {
+    background: #ec4899;
+    transform: scale(1.3);
+  }
+
+  .toc-text {
+    font-weight: 400;
+    line-height: 1.4;
+  }
+
+  /* Different levels of headings */
+  .toc-level-1 {
+    margin-left: 0;
+  }
+
+  .toc-level-1 .toc-link {
+    font-weight: 600;
+    font-size: 1.1rem;
+    padding: 0.6rem 0;
+  }
+
+  .toc-level-1 .toc-bullet {
+    width: 10px;
+    height: 10px;
+    background: #f472b6;
+    box-shadow: 0 0 0 2px rgba(244, 114, 182, 0.2);
+  }
+
+  .toc-level-1 .toc-link:hover .toc-bullet {
+    background: #ec4899;
+    box-shadow: 0 0 0 2px rgba(236, 72, 153, 0.3);
+  }
+
+  .toc-level-2 {
+    margin-left: 0.5rem;
+  }
+
+  .toc-level-2 .toc-link {
+    font-weight: 500;
+    font-size: 1rem;
+  }
+
+  .toc-level-2 .toc-bullet {
+    width: 8px;
+    height: 8px;
+  }
+
+  .toc-level-3 {
+    margin-left: 1.5rem;
+  }
+
+  .toc-level-3 .toc-link {
+    font-weight: 400;
+    font-size: 0.95rem;
+    color: #9ca3af;
+  }
+
+  .toc-level-3 .toc-bullet {
+    width: 6px;
+    height: 6px;
+    background: #ec4899;
+  }
+
+  .toc-level-3 .toc-link:hover {
+    color: #ec4899;
+  }
+
+  .toc-level-4 {
+    margin-left: 2.5rem;
+  }
+
+  .toc-level-4 .toc-link {
+    font-weight: 400;
+    font-size: 0.9rem;
+    color: #a1a1aa;
+  }
+
+  .toc-level-4 .toc-bullet {
+    width: 4px;
+    height: 4px;
+    background: #d946ef;
+  }
+
+  .toc-level-4 .toc-link:hover {
+    color: #d946ef;
+  }
+
+  /* Responsive design */
+  @media (max-width: 768px) {
+    .table-of-contents {
+      margin: 1.5rem 0;
+      padding: 1rem;
+    }
+
+    .toc-toggle {
+      font-size: 1.1rem;
+    }
+
+    .table-of-contents[data-expanded="true"] .toc-content {
+      max-height: 50vh; /* Smaller on mobile */
+    }
+
+    .toc-level-2 {
+      margin-left: 0.25rem;
+    }
+
+    .toc-level-3 {
+      margin-left: 1rem;
+    }
+
+    .toc-level-4 {
+      margin-left: 1.75rem;
+    }
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const tocToggles = document.querySelectorAll('.toc-toggle');
+    
+    tocToggles.forEach(toggle => {
+      const tocContainer = toggle.closest('.table-of-contents');
+      
+      // Set initial state to collapsed
+      tocContainer?.setAttribute('data-expanded', 'false');
+      toggle.setAttribute('aria-expanded', 'false');
+      
+      toggle.addEventListener('click', function() {
+        const isExpanded = tocContainer?.getAttribute('data-expanded') === 'true';
+        const newState = !isExpanded;
+        
+        tocContainer?.setAttribute('data-expanded', newState.toString());
+        toggle.setAttribute('aria-expanded', newState.toString());
+      });
+    });
+  });
+</script>

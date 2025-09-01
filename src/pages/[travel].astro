@@ -2,6 +2,7 @@
 import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import TravelMapSpecific from '../components/TravelMapSpecific.astro';
 import { SITE_TITLE } from '../consts';
 import { getTravelDescription, travelConfig } from '../config/travels';
 import { getEnrichedPostsForTravel } from '../utils/blog-db';
@@ -22,8 +23,6 @@ const { travel } = Astro.params;
 const { travelName } = Astro.props;
 
 const travelPosts = await getEnrichedPostsForTravel(travelName.replace(/ /g, '_'));
-
-console.log(`Travel posts for ${travelName.replace(/ /g, '_')}:`, travelPosts);
 
 ---
 
@@ -104,6 +103,9 @@ console.log(`Travel posts for ${travelName.replace(/ /g, '_')}:`, travelPosts);
                 ) : (
                     <p class="text-center text-gray-500">No posts found for this travel.</p>
                 )}
+
+                <!-- Travel Map -->
+                <TravelMapSpecific travelName={travelName.replace(/ /g, '_')} />
             </div>
         </main>
         <Footer />
