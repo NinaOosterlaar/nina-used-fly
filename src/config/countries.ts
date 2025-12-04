@@ -18,6 +18,11 @@ export const countryConfig: Record<string, {
     description: 'My home country, the Netherlands. I have lived here my whole life. I was born in the east of the Netherlands, lived in Zwolle for a while. Now I am studying in Delft. ',
     flag: '🇳🇱',
     heroImage: '/Country_covers/netherlands.jpg'
+  },
+  'South Korea': {
+    description: 'South Korea is a fascinating blend of ancient traditions and cutting-edge technology. From the bustling streets of Seoul to the serene temples and beautiful landscapes, South Korea offers a unique cultural experience. I visited during the fall season, which added an extra layer of beauty to the trip with vibrant autumn foliage.',
+    flag: '🇰🇷',
+    heroImage: '/Country_covers/south_korea.JPG'
   }
 
 };

@@ -2,6 +2,7 @@ import { db } from '../db/index';
 import { post, postTags, tag, location, travel, country, continent, plans } from '../db/schema';
 import { eq, and, desc, sql, asc } from 'drizzle-orm';
 import { getCollection, type CollectionEntry } from 'astro:content';
+import { getTravelOrder } from '../config/travels';
 
 export interface BlogPostMetadata {
   id: number;
@@ -188,6 +189,8 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
         postCreatedAt: post.createdAt,
         locationName: location.name,
         countryName: country.name,
+        travelId: post.travelId,
+        planId: post.planId,
       })
       .from(post)
       .innerJoin(location, eq(post.locationId, location.id))
@@ -223,6 +226,34 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
 
       // console.log(`Found matching markdown:`, matchingMarkdown ? 'Yes' : 'No');
 
+      // Get travel information if travelId exists
+      let travelTitle: string | null = null;
+      if (dbPost.travelId) {
+        const travelResult = await db
+          .select({ title: travel.title })
+          .from(travel)
+          .where(eq(travel.id, dbPost.travelId))
+          .limit(1);
+
+        if (travelResult.length > 0) {
+          travelTitle = travelResult[0].title;
+        }
+      }
+
+      // Get plan information if planId exists
+      let planTitle: string | null = null;
+      if (dbPost.planId) {
+        const planResult = await db
+          .select({ title: plans.title })
+          .from(plans)
+          .where(eq(plans.id, dbPost.planId))
+          .limit(1);
+
+        if (planResult.length > 0) {
+          planTitle = planResult[0].title;
+        }
+      }
+
       const enrichedPost: EnrichedBlogPost = {
         id: dbPost.postId,
         title: dbPost.postTitle,
@@ -232,8 +263,8 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
         updatedAt: null,
         tags: [],
         location: dbPost.locationName,
-        travelTitle: null,
-        planTitle: null,
+        travelTitle: travelTitle,
+        planTitle: planTitle,
       };
 
       if (matchingMarkdown) {
@@ -259,7 +290,28 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
 // Function to get entriched posts for a specific travel
 export async function getEnrichedPostsForTravel(travelTitle: string): Promise<EnrichedBlogPost[]> {
   try {
-    // Get all posts from the database for the specified travel with proper joins, ordered by start date
+    // Get the order configuration for this travel
+    const orderType = getTravelOrder(travelTitle.replace(/_/g, ' '));
+    
+    // Determine the order clause based on config
+    let orderClause;
+    switch (orderType) {
+      case 'date-asc':
+        orderClause = asc(sql`COALESCE(${post.startDate}, ${post.createdAt})`);
+        break;
+      case 'created-desc':
+        orderClause = desc(post.createdAt);
+        break;
+      case 'created-asc':
+        orderClause = asc(post.createdAt);
+        break;
+      case 'date-desc':
+      default:
+        orderClause = desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`);
+        break;
+    }
+    
+    // Get all posts from the database for the specified travel with proper joins
     const dbPosts = await db
       .select({
         postId: post.id,
@@ -275,7 +327,7 @@ export async function getEnrichedPostsForTravel(travelTitle: string): Promise<En
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(travel, eq(post.travelId, travel.id))
       .where(eq(travel.title, travelTitle))
-      .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date ASC, fallback to created_at ASC
+      .orderBy(orderClause)
       .all();
 
     // console.log(`Found ${dbPosts.length} posts for travel: ${travelTitle}`);
@@ -859,6 +911,7 @@ export async function getPostsWithCoordinatesForCountry(countryName: string): Pr
       .from(post)
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
+      .innerJoin(travel, eq(post.travelId, travel.id)) // Only get posts with travel association
       .where(eq(country.name, countryName))
       .orderBy(desc(post.createdAt));
 
@@ -1002,10 +1055,7 @@ export async function getNonPlanPosts(): Promise<{ title: string; url: string }[
       .from(post)
       .innerJoin(travel, eq(post.travelId, travel.id)) // Only posts with travel association
       .where(
-        and(
-          sql`${post.planId} IS NULL`, // Exclude posts that are part of plans
-          eq(post.isPublished, 1) // Only published posts
-        )
+        sql`${post.planId} IS NULL` // Exclude posts that are part of plans
       )
       .orderBy(desc(post.createdAt))
       .all();
