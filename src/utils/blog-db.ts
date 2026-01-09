@@ -195,7 +195,7 @@ export async function getEnrichedPostsForCountry(countryName: string): Promise<E
       .from(post)
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
-      .where(eq(country.name, countryName))
+      .where(and(eq(country.name, countryName), eq(post.isPublished, 1)))
       .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
       .all();
 
@@ -326,7 +326,7 @@ export async function getEnrichedPostsForTravel(travelTitle: string): Promise<En
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(travel, eq(post.travelId, travel.id))
-      .where(eq(travel.title, travelTitle))
+      .where(and(eq(travel.title, travelTitle), eq(post.isPublished, 1)))
       .orderBy(orderClause)
       .all();
 
@@ -405,7 +405,7 @@ export async function getEnrichedPostsForPlan(planTitle: string): Promise<Enrich
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(plans, eq(post.planId, plans.id))
-      .where(eq(plans.title, planTitle))
+      .where(and(eq(plans.title, planTitle), eq(post.isPublished, 1)))
       .orderBy(asc(post.createdAt))  // Order by just created date
       .all();
 
@@ -486,7 +486,7 @@ export async function getEnrichedPostsForTag(tagName: string): Promise<EnrichedB
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(postTags, eq(post.id, postTags.postId))
       .innerJoin(tag, eq(postTags.tagId, tag.id))
-      .where(eq(tag.name, tagName))
+      .where(and(eq(tag.name, tagName), eq(post.isPublished, 1)))
       .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
       .all();
 
@@ -603,6 +603,7 @@ export async function getNumberOfEnrichedPosts(number: number): Promise<Enriched
       .from(post)
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(travel, eq(post.travelId, travel.id))
+      .where(eq(post.isPublished, 1))
       .orderBy(desc(sql`COALESCE(${post.startDate}, ${post.createdAt})`)) // Order by start_date DESC, fallback to created_at DESC
       .limit(number)
       .all();
@@ -688,6 +689,7 @@ export async function getPostsWithCoordinates(): Promise<PostWithCoordinates[]> 
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(travel, eq(post.travelId, travel.id)) // Ensure posts have a travel association
+      .where(eq(post.isPublished, 1))
       .orderBy(desc(post.createdAt));
 
     // Get all markdown posts to match with database posts
@@ -762,7 +764,7 @@ export async function getPostsWithCoordinatesForTravel(travelTitle: string): Pro
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(travel, eq(post.travelId, travel.id))
-      .where(eq(travel.title, travelTitle))
+      .where(and(eq(travel.title, travelTitle), eq(post.isPublished, 1)))
       .orderBy(desc(post.createdAt));
 
     // Get all markdown posts to match with database posts
@@ -837,7 +839,7 @@ export async function getPostsWithCoordinatesForPlan(planTitle: string): Promise
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(plans, eq(post.planId, plans.id))
-      .where(eq(plans.title, planTitle))
+      .where(and(eq(plans.title, planTitle), eq(post.isPublished, 1)))
       .orderBy(desc(post.createdAt));
 
     // Get all markdown posts to match with database posts
@@ -912,7 +914,7 @@ export async function getPostsWithCoordinatesForCountry(countryName: string): Pr
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(travel, eq(post.travelId, travel.id)) // Only get posts with travel association
-      .where(eq(country.name, countryName))
+      .where(and(eq(country.name, countryName), eq(post.isPublished, 1)))
       .orderBy(desc(post.createdAt));
 
     // Get all markdown posts to match with database posts
@@ -987,6 +989,7 @@ export async function getAllPostsWithCoordinatesForPlans(): Promise<PostWithCoor
       .innerJoin(location, eq(post.locationId, location.id))
       .innerJoin(country, eq(location.countryId, country.id))
       .innerJoin(plans, eq(post.planId, plans.id))
+      .where(eq(post.isPublished, 1))
       .orderBy(desc(post.createdAt));
 
     // Get all markdown posts to match with database posts
@@ -1055,7 +1058,10 @@ export async function getNonPlanPosts(): Promise<{ title: string; url: string }[
       .from(post)
       .innerJoin(travel, eq(post.travelId, travel.id)) // Only posts with travel association
       .where(
-        sql`${post.planId} IS NULL` // Exclude posts that are part of plans
+        and(
+          sql`${post.planId} IS NULL`, // Exclude posts that are part of plans
+          eq(post.isPublished, 1) // Only published posts
+        )
       )
       .orderBy(desc(post.createdAt))
       .all();
@@ -1190,7 +1196,7 @@ export async function getNextPreviousPosts(title: string, folderPath?: string): 
         })
         .from(post)
         .leftJoin(location, eq(post.locationId, location.id))
-        .where(eq(post.id, currentPost.next))
+        .where(and(eq(post.id, currentPost.next), eq(post.isPublished, 1)))
         .limit(1);
 
       if (nextPostResult.length > 0) {
@@ -1232,7 +1238,7 @@ export async function getNextPreviousPosts(title: string, folderPath?: string): 
         })
         .from(post)
         .leftJoin(location, eq(post.locationId, location.id))
-        .where(eq(post.id, currentPost.previous))
+        .where(and(eq(post.id, currentPost.previous), eq(post.isPublished, 1)))
         .limit(1);
 
       if (previousPostResult.length > 0) {

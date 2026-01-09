@@ -20,6 +20,7 @@ const travelWithPosts = await db.select({
 	})
 	.from(travel)
 	.innerJoin(post, eq(post.travelId, travel.id))
+	.where(eq(post.isPublished, 1))
 	.groupBy(travel.id, travel.title, travel.startDate, travel.endDate)
 	.orderBy(sql`MAX(${post.startDate}) DESC`) // Order by most recent post date
 	.all();
