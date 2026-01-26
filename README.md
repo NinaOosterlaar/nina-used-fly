@@ -1,6 +1,6 @@
 # Nina Used Fly 🕊️
 
-Welcome to **Nina Used Fly**—your passport to a whirlwind travel adventure! 🌍✨ Join Nina as she journeys from bustling cities to hidden gems, always accompanied by her trusty companions, Galarian Ponyta and Fidough. Expect quirky stories, clever travel tips, and a dash of fun on every stop. Ready to explore? Let’s get going!
+Welcome to **Nina Used Fly**—your passport to a travel adventure! 🌍✨ Join Nina as she journeys from bustling cities to hidden gems, always accompanied by her trusty companions, Galarian Ponyta and Fidough. Ready to explore? Go visit [ninausedfly.com](http://ninausedfly.com)!
 
 ## Getting Started
 
