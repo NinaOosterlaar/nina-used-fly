@@ -1,0 +1,127 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE } from '../../consts';
+import { db } from '../../db';
+import { continent, country, location, post, travel } from '../../db/schema';
+import { eq, and, sql, count } from 'drizzle-orm';
+import fidoughImage from '../../assets/fidough.png';
+import { getCountryPreview, getCountryHeroImage } from '../../config/countries';
+import { url } from '../../utils/url';
+
+// Get all countries in Australia (Oceania) that have posts (published or unpublished), ordered by most recent post
+const oceaniaCountriesWithPosts = await db
+  .select({
+    countryId: country.id,
+    countryName: country.name,
+    postCount: count(post.id),
+    mostRecentDate: sql<string>`MAX(${post.startDate})`
+  })
+  .from(continent)
+  .innerJoin(country, eq(country.continentId, continent.id))
+  .innerJoin(location, eq(location.countryId, country.id))
+  .innerJoin(post, eq(post.locationId, location.id)) // Get all posts regardless of published status
+  .innerJoin(travel, eq(post.travelId, travel.id)) // Ensure posts have a travel association
+  .where(eq(continent.name, 'Australia'))
+  .groupBy(country.id, country.name)
+  .orderBy(sql`MAX(${post.startDate}) DESC`) // Order by most recent post date
+  .all();
+
+// Default image for countries without specific images
+const defaultImage = fidoughImage.src;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Oceania - ${SITE_TITLE}`} description="Oceanian countries I've visited" />
+	</head>
+	<!-- Google tag (gtag.js) -->
+	<script async src="https://www.googletagmanager.com/gtag/js?id=G-9QVH8372V0"></script>
+	<script>
+		window.dataLayer = window.dataLayer || [];
+		function gtag(){dataLayer.push(arguments);}
+		gtag('js', new Date());
+
+		gtag('config', 'G-9QVH8372V0');
+	</script>
+	<body>
+		<Header />
+		<main>
+			<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+				<!-- Page Header -->
+				<div class="text-center mb-12">
+					<h1 class="title-font text-5xl md:text-6xl font-bold text-pink-400 mb-6 leading-tight">
+						Oceania
+					</h1>
+					<p class="text-gray-600 max-w-3xl mx-auto md:text-xl">
+						Exploring the unique wildlife, stunning beaches, and Pacific island cultures across Oceania. 
+						Here are the countries that I have visited and documented my travels in.
+					</p>
+				</div>
+
+				<!-- Countries Grid -->
+				{oceaniaCountriesWithPosts.length > 0 ? (
+					<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+						{oceaniaCountriesWithPosts.map((countryData) => (
+							<div onclick={`location.href='${url(`/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}'`} class="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300 cursor-pointer">
+								<div class="h-48 overflow-hidden">
+									<img
+										src={getCountryHeroImage(countryData.countryName, defaultImage)}
+										alt={countryData.countryName}
+										class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+									/>
+								</div>
+								<div class="p-6">
+									<div class="flex items-center justify-between mb-3">
+										<h3 class="title-font text-xl font-semibold text-gray-800 gap-3">
+											{countryData.countryName}
+										</h3>
+										<span class="bg-pink-100 text-pink-600 px-3 py-1 rounded-full text-sm font-medium min-w-[72px]">
+											{countryData.postCount} {countryData.postCount === 1 ? 'post' : 'posts'}
+										</span>
+									</div>
+									<p class="text-gray-600 mb-4">
+										{getCountryPreview(countryData.countryName)}
+									</p>
+									<a
+										href={url(`/${countryData.countryName.toLowerCase().replace(/\s+/g, '-')}`)}
+										class="inline-flex items-center text-pink-500 hover:text-pink-700 font-medium transition-colors duration-200"
+									>
+										Explore {countryData.countryName}
+										<i class="fas fa-arrow-right ml-2"></i>
+									</a>
+								</div>
+							</div>
+						))}
+					</div>
+				) : (
+					<div class="text-center py-12">
+						<div class="text-gray-400 mb-4">
+							<video 
+							width="480" 
+							autoplay 
+							loop 
+							muted 
+							playsinline
+							class="mx-auto rounded-lg"
+							style="aspect-ratio: auto;"
+						>
+							<source src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.mp4" type="video/mp4">
+							<source src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.webm" type="video/webm">
+							<!-- Fallback to GIF for older browsers -->
+							<img src="https://media.giphy.com/media/11VrJR0acdEe9a/giphy.gif" alt="Sad Pokemon" width="480" style="aspect-ratio: auto;" />
+						</video>
+						</div>
+						<h3 class="text-xl font-semibold text-gray-600 mb-2">No Oceanian Adventures Yet</h3>
+						<p class="text-gray-500">
+							Stay tuned for upcoming Oceanian travel stories and adventures!
+						</p>
+					</div>
+				)}
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

@@ -16,7 +16,7 @@ const uniqueId = `${id}-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
 <div class="image-carousel" style={`max-width: ${maxWidth}; margin: 2rem auto; text-align: center;`}>
-  <div style="position: relative; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background: #f9fafb;">
+  <div style="position: relative; overflow: hidden; border-radius: 8px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); background: #fce7f3;">
     <div id={`${uniqueId}-track`} style="display: flex; transition: transform 0.3s ease-in-out;">
       {images.map((image) => (
         <img 
