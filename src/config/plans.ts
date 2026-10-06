@@ -6,7 +6,12 @@ export const planConfig: Record<string, {
     'Three Weeks South Korea': {
         description: 'A comprehensive 3-week itinerary exploring the highlights of South Korea in the fall.',
         heroImage: '/plans/Plans_covers/Flag_of_South_Korea.png'
+    },
+    'East China and Tokyo': {
+        description: 'Plan for my after graduation trip to Beijing, Shanghai, and Tokyo, a dream come true.',
+        heroImage: '/plans/Plans_covers/china_japan.jpg'
     }
+
 };
 
 export function getPlanPreview(planName: string, maxLength: number = 155): string {

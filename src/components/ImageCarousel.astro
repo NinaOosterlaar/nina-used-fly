@@ -12,7 +12,11 @@ export interface Props {
 }
 
 const { images, maxWidth = "500px", maxHeight = "400px", id = "carousel", description } = Astro.props;
-const uniqueId = `${id}-${Math.random().toString(36).substr(2, 9)}`;
+const safeId = String(id ?? "carousel")
+  .trim()
+  .replace(/[^a-zA-Z0-9_-]+/g, "-")
+  .replace(/^-+|-+$/g, "") || "carousel";
+const uniqueId = `${safeId}-${Math.random().toString(36).substr(2, 9)}`;
 ---
 
 <div class="image-carousel" style={`max-width: ${maxWidth}; margin: 2rem auto; text-align: center;`}>
