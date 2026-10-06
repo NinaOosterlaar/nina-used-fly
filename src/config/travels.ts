@@ -24,6 +24,11 @@ export const travelConfig: Record<string, {
     description: "A journey through South Korea during the beautiful fall season. Join us on this trip that blends nature and culture.",
     heroImage: '/Travels_covers/south_korea.jpg',
     order: 'date-asc' // Chronological order
+    },
+    'Relaxing Trips': {
+    description: "This page is dedicated to all my chill vacations. The trips you take when you just need to get away from it all and relax.",
+    heroImage: 'public/Relaxing_Trips/Forest_escape/forest.JPG',
+    order: 'date-desc' // Newest first
     }
 };
 

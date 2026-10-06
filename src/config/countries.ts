@@ -23,8 +23,17 @@ export const countryConfig: Record<string, {
     description: 'South Korea is a fascinating blend of ancient traditions and cutting-edge technology. From the bustling streets of Seoul to the serene temples and beautiful landscapes, South Korea offers a unique cultural experience. I visited during the fall season, which added an extra layer of beauty to the trip with vibrant autumn foliage.',
     flag: '🇰🇷',
     heroImage: '/Country_covers/south_korea.JPG'
+  },
+  'China': {
+    description: 'China is a vast and diverse country with a rich history and culture. From the Great Wall to the bustling cities of Beijing and Shanghai, there is so much to explore. I have only scratched the surface of what China has to offer, but I am eager to return and discover more.',
+    flag: '🇨🇳',
+    heroImage: 'src/assets/fidough.png'
+  },
+  'Japan': {
+    description: 'Japan is a country that seamlessly blends tradition and modernity. From the serene temples and beautiful cherry blossoms to the bustling streets of Tokyo, Japan offers a unique cultural experience. I have always been fascinated by Japanese culture and I am excited to explore more of it in the future.',
+    flag: '🇯🇵',
+    heroImage: 'src/assets/fidough.png'
   }
-
 };
 
 // Helper function to get country preview text (truncated for continent pages)
